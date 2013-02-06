@@ -48,13 +48,13 @@ vector<Token> tokenise(const string &program) {
   for(auto k = program.begin(); k != program.end(); ++k) {
     switch(*k) {
       case '\n':
-	tokens.push_back(LINEFEED);
+	    tokens.push_back(LINEFEED);
 	break;
       case ' ':
-	tokens.push_back(SPACE);
+	    tokens.push_back(SPACE);
 	break;
       case '\t':
-	tokens.push_back(TAB);
+	    tokens.push_back(TAB);
 	break;
     }
   }
@@ -89,6 +89,7 @@ const string readFile(const string filename) {
         while(!input.eof()) {
             getline(input, line);
             fileContents.append(line);
+            fileContents.append("\n");
         }
     }
     return fileContents;
@@ -96,7 +97,7 @@ const string readFile(const string filename) {
 
 // note: could be implemented using some sort of lookup table
 //       data structure indexed by a pair of enums.
-Mode determineMode(Token t1, Token t2) {
+const Mode determineMode(const Token t1, const Token t2) {
   switch(t1) {
     case LINEFEED:
       return FLOWCONT;
@@ -105,13 +106,13 @@ Mode determineMode(Token t1, Token t2) {
     case TAB:
       switch(t2) {
         case LINEFEED:
-	  return IO;
+	      return IO;
         case SPACE:
-	  return ARITH;
+	      return ARITH;
         case TAB:
-	  return HEAP;
+	      return HEAP;
         default:
-	  return NOTHING;
+	      return NOTHING;
       }
     default:
       return NOTHING;
@@ -126,7 +127,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
     cerr << "Error: unreachable token" << endl;
     exit(1);
   }
-  if(m == FLOWCONT) { // case [LF][LF][LF] means: exit the program
+  if(m == FLOWCONT) { // case [LF][LF][LF] means: exit the program. Not sure if here is the right place, as more rules will come...
       if(tokens[2] == LINEFEED && tokens[3] == LINEFEED) {
           exit(0);
       }
