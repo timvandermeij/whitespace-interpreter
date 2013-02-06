@@ -11,7 +11,11 @@ enum Token {
 };
 
 enum Instruction {
-  UNDEF,
+  PUSH, DUP, COPY, SWAP, DISCARD, SLIDE, // stack manipulations
+  ADD, SUB, MUL, DIV, MOD, // arithmetic operations
+  STORE, RETRIEVE, // heap access
+  MARK, CALL, JUMP, JUMPZERO, JUMPNEG, ENDSUB, ENDPROG, // flow control
+  WRITEC, WRITEN, READC, READN, // i/o operations
 };
 
 class Interpreter {

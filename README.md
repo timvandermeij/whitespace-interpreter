@@ -4,11 +4,11 @@ A Whitespace interpreter written in C++.
 
 instructions
 ============
-Compile with ``g++ -o whitespace main.cpp -std=c++1``
+Compile with ``g++ -o whitespace main.cpp -std=c++1``.
 
 authors
 =======
-(in alphabetical order):
+In alphabetical order:
 * Simon Klaver
 * Tim van der Meij
 * Willem Obbens
