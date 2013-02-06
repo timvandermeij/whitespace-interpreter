@@ -1,6 +1,7 @@
 #include <iostream>
-#include <list>
+#include <vector>
 #include <algorithm>
+#include <cstdlib>
 
 using namespace std;
 
@@ -8,6 +9,15 @@ enum Token {
   LINEFEED,
   SPACE,
   TAB,
+};
+
+enum Mode {
+  STACK,
+  ARITH,
+  HEAP,
+  FLOWCONT,
+  IO,
+  NOTHING,
 };
 
 enum Instruction {
@@ -18,42 +28,91 @@ enum Instruction {
   WRITEC, WRITEN, READC, READN, // i/o operations
 };
 
+typedef vector<Instruction> Program;
+
 class Interpreter {
   public:
   private:
-    list<Instruction> program;
-    list<int> heap;
-    list<int> stack; //
-    list<int> callStack; // to remember where to return to
+    vector<Instruction> program;
+    vector<int> heap;
+    vector<int> stack; //
+    vector<int> callStack; // to remember where to return to
     unsigned int pc; // program counter
 };
 
-list<Token> tokenise(const string &program) {
-  list<Token> tokens;
+vector<Token> tokenise(const string &program) {
+  vector<Token> tokens;
 
   for(auto k = program.begin(); k != program.end(); ++k) {
     switch(*k) {
-      case '\n': tokens.push_back(LINEFEED); break;
-      case ' ': tokens.push_back(SPACE); break;
-      case '\t': tokens.push_back(TAB); break;
+      case '\n':
+	tokens.push_back(LINEFEED);
+	break;
+      case ' ':
+	tokens.push_back(SPACE);
+	break;
+      case '\t':
+	tokens.push_back(TAB);
+	break;
     }
   }
   
   return tokens;
 }
 
-void printTokens(list<Token> tokens) {
+void printTokens(const vector<Token> &tokens) {
   int length = tokens.size();
   for(int k = 0; k < length; ++k) {
-    switch(tokens.front()) {
-      case LINEFEED: cout << "LF"; break;
-      case SPACE: cout << "S"; break;
-      case TAB: cout << "T"; break;
+    switch(tokens[k]) {
+      case LINEFEED:
+	cout << "LF";
+	break;
+      case SPACE:
+	cout << "S";
+	break;
+      case TAB:
+	cout << "T";
+	break;
     }
-    tokens.pop_front();
     if(k + 1 != length)
       cout << ":";
   }
+}
+
+// note: could be implemented using some sort of lookup table
+//       data structure indexed by a pair of enums.
+Mode determineMode(Token t1, Token t2) {
+  switch(t1) {
+    case LINEFEED:
+      return FLOWCONT;
+    case SPACE:
+      return STACK;
+    case TAB:
+      switch(t2) {
+        case LINEFEED:
+	  return IO;
+        case SPACE:
+	  return ARITH;
+        case TAB:
+	  return HEAP;
+        default:
+	  return NOTHING;
+      }
+    default:
+      return NOTHING;
+  }
+}
+
+Program tokensToProgram(const vector<Token> &tokens) {
+  int amount = tokens.size();
+  if(amount < 3) exit(0); // empty program
+  Mode m = determineMode(tokens[1], tokens[2]);
+  if(m == NOTHING) {
+    cerr << "Error: unreachable token" << endl;
+    exit(1);
+  }
+  Program p;
+  return p;
 }
 
 int main() {
