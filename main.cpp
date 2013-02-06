@@ -2,13 +2,15 @@
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
+#include <string>
+#include <fstream>
 
 using namespace std;
 
 enum Token {
-  LINEFEED,
-  SPACE,
-  TAB,
+    LINEFEED,
+    SPACE,
+    TAB,
 };
 
 enum Mode {
@@ -21,11 +23,11 @@ enum Mode {
 };
 
 enum Instruction {
-  PUSH, DUP, COPY, SWAP, DISCARD, SLIDE, // stack manipulations
-  ADD, SUB, MUL, DIV, MOD, // arithmetic operations
-  STORE, RETRIEVE, // heap access
-  MARK, CALL, JUMP, JUMPZERO, JUMPNEG, ENDSUB, ENDPROG, // flow control
-  WRITEC, WRITEN, READC, READN, // i/o operations
+    PUSH, DUP, COPY, SWAP, DISCARD, SLIDE, // stack manipulations
+    ADD, SUB, MUL, DIV, MOD, // arithmetic operations
+    STORE, RETRIEVE, // heap access
+    MARK, CALL, JUMP, JUMPZERO, JUMPNEG, ENDSUB, ENDPROG, // flow control
+    WRITEC, WRITEN, READC, READN, // i/o operations
 };
 
 typedef vector<Instruction> Program;
@@ -55,9 +57,7 @@ vector<Token> tokenise(const string &program) {
 	tokens.push_back(TAB);
 	break;
     }
-  }
-  
-  return tokens;
+    return tokens;
 }
 
 void printTokens(const vector<Token> &tokens) {
@@ -77,6 +77,19 @@ void printTokens(const vector<Token> &tokens) {
     if(k + 1 != length)
       cout << ":";
   }
+
+const string readFile(const string filename) {
+    string line, fileContents;
+    ifstream input;
+
+    input.open(filename.c_str());
+    if(input.is_open()) {
+        while(!input.eof()) {
+            getline(input, line);
+            fileContents.append(line);
+        }
+    }
+    return fileContents;
 }
 
 // note: could be implemented using some sort of lookup table
@@ -116,10 +129,8 @@ Program tokensToProgram(const vector<Token> &tokens) {
 }
 
 int main() {
-    cout << "Hello whitespace" << endl;
-    //Instruction a = 500;
-    string test("\t\n \n\t   ");
-    printTokens(tokenise(test));
+    string test = readFile("hello_world.ws");
+    printTokens(tokenize(test));
     cout << endl;
     return 0;
 }
