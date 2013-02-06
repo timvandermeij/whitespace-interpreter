@@ -57,7 +57,8 @@ vector<Token> tokenise(const string &program) {
 	tokens.push_back(TAB);
 	break;
     }
-    return tokens;
+  }
+  return tokens;
 }
 
 void printTokens(const vector<Token> &tokens) {
@@ -77,6 +78,7 @@ void printTokens(const vector<Token> &tokens) {
     if(k + 1 != length)
       cout << ":";
   }
+}
 
 const string readFile(const string filename) {
     string line, fileContents;
@@ -129,8 +131,8 @@ Program tokensToProgram(const vector<Token> &tokens) {
 }
 
 int main() {
-    string test = readFile("hello_world.ws");
-    printTokens(tokenize(test));
-    cout << endl;
-    return 0;
+  string test = readFile("hello_world.ws");
+  printTokens(tokenise(test));
+  cout << endl;
+  return 0;
 }
