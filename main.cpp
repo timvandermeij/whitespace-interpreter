@@ -126,6 +126,11 @@ Program tokensToProgram(const vector<Token> &tokens) {
     cerr << "Error: unreachable token" << endl;
     exit(1);
   }
+  if(m == FLOWCONT) { // case [LF][LF][LF] means: exit the program
+      if(tokens[2] == LINEFEED && tokens[3] == LINEFEED) {
+          exit(0);
+      }
+  }
   Program p;
   return p;
 }
