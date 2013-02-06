@@ -131,8 +131,8 @@ Program tokensToProgram(const vector<Token> &tokens) {
 }
 
 int main() {
-  string test = readFile("hello_world.ws");
-  printTokens(tokenise(test));
+  string fileContents = readFile("hello_world.ws");
+  printTokens(tokenize(fileContents));
   cout << endl;
   return 0;
 }
