@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <string>
 #include <fstream>
-#include <sstream>
 
 using namespace std;
 
@@ -77,8 +76,7 @@ const string readFile(const string filename) {
 
 int main() {
     string test = readFile("hello_world.ws");
-    cout << test << endl;
-    //string test = "\t\n \n\t   ";
-    //printTokens(tokenize(test));
+    printTokens(tokenize(test));
+    cout << endl;
     return 0;
 }
