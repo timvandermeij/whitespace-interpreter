@@ -1,4 +1,4 @@
 whitespace-interpreter
 ======================
 
-Whitespace interpreter
+A Whitespace interpreter written in C++.
