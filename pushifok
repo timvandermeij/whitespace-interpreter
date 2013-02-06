@@ -1,4 +1,4 @@
-FLAGS='-std=c++11 -fpermisse'
+FLAGS='-std=c++11 -fpermissive'
 g++ -o wspace main.cpp $FLAGS
 if [[ $? -eq 0 ]]; then
    echo 'the program was compiled successfully, going to push...'
