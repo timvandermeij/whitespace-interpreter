@@ -26,7 +26,7 @@ class Interpreter {
     private:
         list<Instruction> program;
         list<int> heap;
-        list<int> stack; //
+        list<int> stack;
         list<int> callStack; // to remember where to return to
         unsigned int pc; // program counter
 };
@@ -34,7 +34,7 @@ class Interpreter {
 list<Token> tokenize(const string &program) {
     list<Token> tokens;
 
-    for(auto k = program.begin(); k != program.end(); ++k) {
+    for(auto k = program.begin(); k != program.end(); k++) {
         switch(*k) {
             case '\n': tokens.push_back(LINEFEED); break;
             case ' ': tokens.push_back(SPACE); break;
@@ -47,7 +47,7 @@ list<Token> tokenize(const string &program) {
 void printTokens(list<Token> tokens) {
     int length = tokens.size();
 
-    for(int k = 0; k < length; ++k) {
+    for(int k = 0; k < length; k++) {
         switch(tokens.front()) {
             case LINEFEED: cout << "LF"; break;
             case SPACE: cout << "S"; break;
@@ -75,8 +75,8 @@ const string readFile(const string filename) {
 }
 
 int main() {
-    string test = readFile("hello_world.ws");
-    printTokens(tokenize(test));
+    string fileContents = readFile("hello_world.ws");
+    printTokens(tokenize(fileContents));
     cout << endl;
     return 0;
 }
