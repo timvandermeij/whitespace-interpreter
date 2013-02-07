@@ -242,10 +242,8 @@ Program tokensToProgram(const vector<Token> &tokens) {
             } else if(tokens[k] == TAB) {
                 if(tokens[k++] == SPACE) {
                     p.push_back(READC);
-                    p.push_back(tokens[k + 2]); // k + 1 was the tab, so k + 2 is the character to put on the stack
                 } else if(tokens[k++] == TAB) {
                     p.push_back(READN);
-                    p.push_back(tokensToNumber(tokens, k));
                 } else {
                     throw unreachableToken;
                 }
