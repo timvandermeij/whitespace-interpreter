@@ -277,7 +277,7 @@ void processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
 
 void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) {
-        k++
+        k++;
         if(tokens[k] == SPACE) { // MARK
             p.push_back(MARK);
             parseNumber(tokens, p, k);
