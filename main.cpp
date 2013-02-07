@@ -196,14 +196,18 @@ vector<Token> tokensToLabel(const vector<Token> &tokens, int &index) {
     return label;
 }
 
+void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
+    if(tokens[++k] == LINEFEED) { // No label as argument
+        throw noLabelArg;
+    } else { // We're going to parse the label now
+        p.push_back(tokensToNumber(tokens, k));
+    }
+}
+
 void processStackManip(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) { // PUSH
         p.push_back(PUSH);
-        if(tokens[++k] == LINEFEED) { // No number as argument to PUSH
-            throw noNumericArg;
-        } else { // We're going to parse the number now
-            p.push_back(tokensToNumber(tokens, k));
-        }
+        parseNumber(tokens, p, k);
     } else if(tokens[k] == TAB) { // COPY or SLIDE
         k++;
         if(tokens[k] == SPACE) { // COPY
@@ -215,11 +219,7 @@ void processStackManip(const vector<Token> &tokens, Program &p, int &k) {
         }
         // COPY and SLIDE both require a numeric argument,
         // so we shall try to parse a number now
-        if(tokens[++k] == LINEFEED) { // No number as argument to COPY or SLIDE
-            throw noNumericArg;
-        } else { // The actual parsing is situated in this branch
-            p.push_back(tokensToNumber(tokens, k));
-        } // Duplicated from PUSH
+        parseNumber(tokens, p, k);
     } else if(tokens[k] == LINEFEED) { // DUP, SWAP or DISCARD
         // Could perhaps also be done more concisely
         // with the ?:-operator, but I reckon something will go wrong
@@ -280,25 +280,13 @@ void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
         k++
         if(tokens[k] == SPACE) { // MARK
             p.push_back(MARK);
-            if(tokens[++k] == LINEFEED) { // No label as argument to MARK
-                throw noLabelArg;
-            } else { // We're going to parse the label now
-                p.push_back(tokensToNumber(tokens, k));
-            }
+            parseNumber(tokens, p, k);
         } else if(tokens[k] == TAB) { // CALL
             p.push_back(CALL);
-            if(tokens[++k] == LINEFEED) { // No label as argument to CALL
-                throw noLabelArg;
-            } else { // We're going to parse the label now
-                p.push_back(tokensToNumber(tokens, k));
-            }
+            parseNumber(tokens, p, k);
         } else if(tokens[k] == LINEFEED) { // JUMP
             p.push_back(JUMP);
-            if(tokens[++k] == LINEFEED) { // No label as argument to JUMP
-                throw noLabelArg;
-            } else { // We're going to parse the label now
-                p.push_back(tokensToNumber(tokens, k));
-            }
+            parseNumber(tokens, p, k);
         } else {
             throw unreachableToken;
         }
@@ -306,18 +294,10 @@ void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
         k++;
         if(tokens[k] == SPACE) { // JUMPZERO
             p.push_back(JUMPZERO);
-            if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
-                throw noLabelArg;
-            } else { // We're going to parse the label now
-                p.push_back(tokensToNumber(tokens, k));
-            }
+            parseNumber(tokens, p, k);
         } else if(tokens[k] == TAB) { // JUMPNEG
             p.push_back(JUMPNEG);
-            if(tokens[++k] == LINEFEED) { // No label as argument to JUMPNEG
-                throw noLabelArg;
-            } else { // We're going to parse the label now
-                p.push_back(tokensToNumber(tokens, k));
-            }
+            parseNumber(tokens, p, k);
         } else if(tokens[k] == LINEFEED) { // ENDSUB
             p.push_back(ENDSUB);
         } else {
@@ -354,7 +334,6 @@ void processIO(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-// Let us first complete this potentially monolithic function and refactor it afterwards.
 Program tokensToProgram(const vector<Token> &tokens) {
     int amount = tokens.size();
     if(amount < 3) {
