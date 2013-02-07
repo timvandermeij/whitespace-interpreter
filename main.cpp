@@ -29,11 +29,17 @@ class NoLabelArgument: public NoArgument {
     }
 } noLabelArg;
 
-class SomeException: public exception {
+class prematureEndException: public exception {
     virtual const char *what() const throw () {
-        return "Error: something bad happened.";
+        return "Error: number ended prematurely.";
     }
-} someException;
+} prematureEndException;
+
+class undefinedSignException: public exception {
+    virtual const char *what() const throw () {
+        return "Error: sign of the number is undefined.";
+    }
+} undefinedSignException;
 
 enum Token {
     LINEFEED, SPACE, TAB,
@@ -153,14 +159,24 @@ const Instruction determineInstruction(const Mode m, const Token t1, const Token
 long tokensToNumber(const vector<Token> &tokens, int &index) {
     vector<Token> binNum;
     int amount = tokens.size();
+    int sign;
 
     while(tokens[index] != LINEFEED) { // A number is terminated by a LINEFEED
         binNum.push_back(tokens[index++]);
-        if(index == amount) { // Number ended prematurely, throw exception
-            throw someException;
+        if(index == amount) {
+            throw prematureEndException;
         }
     }
-    return 1; // This should be the binary number itself.
+
+    if(binNum.front() == SPACE) {
+        sign = 1;
+    } else if(binNum.front() == TAB) {
+        sign = -1;
+    } else {
+        throw undefinedSignException;
+    }
+
+    return 1; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
     //return (0xDEADBEEF & 0x1337 & 0xDEC0DE) | (0xC0C4C014 & 0xF00D);
 }
 
@@ -229,20 +245,20 @@ Program tokensToProgram(const vector<Token> &tokens) {
         } else if(m == ARITH) {
             if(tokens[k] == SPACE) {
 	        k++;
-                if(tokens[k] == SPACE) {
+	        if(tokens[k] == SPACE) { // ADD
                     p.push_back(ADD);
-                } else if(tokens[k] == TAB) {
+	        } else if(tokens[k] == TAB) { // SUB
                     p.push_back(SUB);
-                } else if(tokens[k] == LINEFEED) {
+	        } else if(tokens[k] == LINEFEED) { // MUL
                     p.push_back(MUL);
                 } else {
                     throw unreachableToken;
                 }
             } else if(tokens[k] == TAB) {
 	        k++;
-                if(tokens[k] == SPACE) {
+	        if(tokens[k] == SPACE) { // DIV
                     p.push_back(DIV);
-                } else if(tokens[k] == TAB) {
+	        } else if(tokens[k] == TAB) { // MOD
                     p.push_back(MOD);
                 } else {
                     throw unreachableToken;
@@ -251,21 +267,21 @@ Program tokensToProgram(const vector<Token> &tokens) {
                 throw unreachableToken;
             }
         } else if(m == HEAPACC) {
-            if(tokens[k] == SPACE) {
+            if(tokens[k] == SPACE) { // STORE
                 p.push_back(STORE);
-            } else if(tokens[k] == TAB) {
+            } else if(tokens[k] == TAB) { // RETRIEVE
                 p.push_back(RETRIEVE);
             } else {
                 throw unreachableToken;
             }
         } else if(m == FLOWCONT) { // Needs to be completed
             if(tokens[k] == TAB) {
-                if(tokens[++k] == LINEFEED) {
+                if(tokens[++k] == LINEFEED) { // ENDSUB
                     p.push_back(ENDSUB);
                 } else {
                     throw unreachableToken;
                 }
-            } else if(tokens[k++] == LINEFEED && tokens[k] == LINEFEED) {
+            } else if(tokens[k++] == LINEFEED && tokens[k] == LINEFEED) { // ENDPROG
                 p.push_back(ENDPROG);
             } else {
                 throw unreachableToken;
@@ -273,18 +289,18 @@ Program tokensToProgram(const vector<Token> &tokens) {
         } else if(m == IO) {
             if(tokens[k] == SPACE) {
 	        k++;
-                if(tokens[k] == SPACE) {
+                if(tokens[k] == SPACE) { // WRITEC
                     p.push_back(WRITEC);
-                } else if(tokens[k] == TAB) {
+                } else if(tokens[k] == TAB) { // WRITEN
                     p.push_back(WRITEN);
                 } else {
                     throw unreachableToken;
                 }
             } else if(tokens[k] == TAB) {
 	        k++;
-                if(tokens[k] == SPACE) {
+                if(tokens[k] == SPACE) { // READC
                     p.push_back(READC);
-                } else if(tokens[k] == TAB) {
+                } else if(tokens[k] == TAB) { // READN
                     p.push_back(READN);
                 } else {
                     throw unreachableToken;
