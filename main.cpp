@@ -31,7 +31,7 @@ class NoLabelArgument: public NoArgument {
 
 class prematureEndException: public exception {
     virtual const char *what() const throw () {
-        return "Error: number ended prematurely.";
+        return "Error: number or label ended prematurely.";
     }
 } prematureEndException;
 
@@ -42,11 +42,11 @@ class undefinedSignException: public exception {
 } undefinedSignException;
 
 enum Token {
-    LINEFEED, SPACE, TAB,
+    LINEFEED, SPACE, TAB
 };
 
 enum Mode {
-    STACKMANIP, ARITH, HEAPACC, FLOWCONT, IO,
+    STACKMANIP, ARITH, HEAPACC, FLOWCONT, IO
 };
 
 enum Instruction {
@@ -54,7 +54,11 @@ enum Instruction {
     ADD, SUB, MUL, DIV, MOD, // Arithmetic operations
     STORE, RETRIEVE, // Heap access
     MARK, CALL, JUMP, JUMPZERO, JUMPNEG, ENDSUB, ENDPROG, // Flow control
-    WRITEC, WRITEN, READC, READN, // I/O operations
+    WRITEC, WRITEN, READC, READN // I/O operations
+};
+
+enum Signs {
+    POSITIVE, NEGATIVE
 };
 
 typedef vector<Instruction> Program;
@@ -169,19 +173,30 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     }
 
     if(binNum.front() == SPACE) {
-        sign = 1;
+        sign = POSITIVE;
     } else if(binNum.front() == TAB) {
-        sign = -1;
+        sign = NEGATIVE;
     } else {
         throw undefinedSignException;
     }
-
     return 1; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
-    //return (0xDEADBEEF & 0x1337 & 0xDEC0DE) | (0xC0C4C014 & 0xF00D);
 }
 
-// Let us first complete this potentially monolithic function,
-// and refactor it afterwards.
+// Side-effect: mutates the index from the for-loop in tokensToProgram
+vector<Token> tokensToLabel(const vector<Token> &tokens, int &index) {
+    vector<Token> label;
+    int amount = tokens.size();
+
+    while(tokens[index] != LINEFEED) { // A label is terminated by a LINEFEED
+        label.push_back(tokens[index++]);
+        if(index == amount) {
+            throw prematureEndException;
+        }
+    }
+    return label; // Not entirely sure if we want this...
+}
+
+// Let us first complete this potentially monolithic function and refactor it afterwards.
 Program tokensToProgram(const vector<Token> &tokens) {
     int amount = tokens.size();
     if(amount < 3) {
@@ -196,8 +211,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
     }
     Program p;
 
-    // FLOWCONT and STACKMANIP are only 1 token long,
-    // the rest is 2 tokens long
+    // FLOWCONT and STACKMANIP are only 1 token long, the rest is 2 tokens long
     int start = ((m == FLOWCONT || m == STACKMANIP) ? 1 : 2);
 
     for(int k = start; k < amount; k++) {
@@ -272,7 +286,21 @@ Program tokensToProgram(const vector<Token> &tokens) {
             }
         } else if(m == FLOWCONT) { // Needs to be completed
             if(tokens[k] == TAB) {
-                if(tokens[k++] == LINEFEED) { // ENDSUB
+                if(tokens[k++] == SPACE) { // JUMPZERO
+                    p.push_back(JUMPZERO);
+                    if(tokens[k + 2] == LINEFEED) { // No label as argument to JUMPZERO
+                        throw noLabelArg;
+                    } else { // We're going to parse the label now
+                        p.push_back(tokensToLabel(tokens, k));
+                    }
+                } else if(tokens[k++] == TAB) { // JUMPNEG
+                    p.push_back(JUMPNEG);
+                    if(tokens[k + 2] == LINEFEED) { // No label as argument to JUMPZERO
+                        throw noLabelArg;
+                    } else { // We're going to parse the label now
+                        p.push_back(tokensToLabel(tokens, k));
+                    }
+                } else if(tokens[k++] == LINEFEED) { // ENDSUB
                     p.push_back(ENDSUB);
                 } else {
                     throw unreachableToken;
