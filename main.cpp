@@ -226,6 +226,13 @@ Program tokensToProgram(const vector<Token> &tokens) {
             }
         } else if(m == ARITH) {
         } else if(m == HEAPACC) {
+            if(tokens[k] == SPACE) {
+                p.push_back(STORE);
+            } else if(tokens[k] == TAB) {
+                p.push_back(RETRIEVE);
+            } else {
+                throw unreachableToken;
+            }
         } else if(m == FLOWCONT) {
             if(tokens[k] == LINEFEED && tokens[k++] == LINEFEED) {
                 exit(0);
