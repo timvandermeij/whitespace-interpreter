@@ -193,7 +193,7 @@ vector<Token> tokensToLabel(const vector<Token> &tokens, int &index) {
             throw prematureEndException;
         }
     }
-    return label; // Not entirely sure if we want this...
+    return label;
 }
 
 // Let us first complete this potentially monolithic function and refactor it afterwards.
@@ -288,9 +288,35 @@ Program tokensToProgram(const vector<Token> &tokens) {
             } else {
                 throw unreachableToken;
             }
-        } else if(m == FLOWCONT) { // Needs to be completed
-            if(tokens[k] == TAB) {
-	        k++;
+        } else if(m == FLOWCONT) {
+            if(tokens[k] == SPACE) {
+                k++
+                if(tokens[k] == SPACE) { // MARK
+                    p.push_back(MARK);
+                    if(tokens[++k] == LINEFEED) { // No label as argument to MARK
+                        throw noLabelArg;
+                    } else { // We're going to parse the label now
+                        p.push_back(tokensToNumber(tokens, k));
+                    }
+                } else if(tokens[k] == TAB) { // CALL
+                    p.push_back(CALL);
+                    if(tokens[++k] == LINEFEED) { // No label as argument to CALL
+                        throw noLabelArg;
+                    } else { // We're going to parse the label now
+                        p.push_back(tokensToNumber(tokens, k));
+                    }
+                } else if(tokens[k] == LINEFEED) { // JUMP
+                    p.push_back(JUMP);
+                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMP
+                        throw noLabelArg;
+                    } else { // We're going to parse the label now
+                        p.push_back(tokensToNumber(tokens, k));
+                    }
+                } else {
+                    throw unreachableToken;
+                }
+            } else if(tokens[k] == TAB) {
+	            k++;
                 if(tokens[k] == SPACE) { // JUMPZERO
                     p.push_back(JUMPZERO);
                     if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
@@ -300,7 +326,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
                     }
                 } else if(tokens[k] == TAB) { // JUMPNEG
                     p.push_back(JUMPNEG);
-                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
+                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMPNEG
                         throw noLabelArg;
                     } else { // We're going to parse the label now
                         p.push_back(tokensToNumber(tokens, k));
