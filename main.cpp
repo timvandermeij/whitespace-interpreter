@@ -218,7 +218,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
         if(m == STACKMANIP) {
             if(tokens[k] == SPACE) { // PUSH
                 p.push_back(PUSH);
-                if(tokens[++k] == LINEFEED) { // No number as argument to PUSH
+                if(tokens[k++] == LINEFEED) { // No number as argument to PUSH
                     throw noNumericArg;
                 } else { // We're going to parse the number now
                     p.push_back(tokensToNumber(tokens, k));
@@ -234,7 +234,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
                 }
                 // COPY and SLIDE both require a numeric argument,
                 // so we shall try to parse a number now
-                if(tokens[++k] == LINEFEED) { // No number as argument to COPY or SLIDE
+                if(tokens[k++] == LINEFEED) { // No number as argument to COPY or SLIDE
                     throw noNumericArg;
                 } else { // The actual parsing is situated in this branch
                     p.push_back(tokensToNumber(tokens, k));
@@ -316,7 +316,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
             }
         } else if(m == IO) {
             if(tokens[k] == SPACE) {
-	        k++;
+	            k++;
                 if(tokens[k] == SPACE) { // WRITEC
                     p.push_back(WRITEC);
                 } else if(tokens[k] == TAB) { // WRITEN
@@ -325,7 +325,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
                     throw unreachableToken;
                 }
             } else if(tokens[k] == TAB) {
-	        k++;
+	            k++;
                 if(tokens[k] == SPACE) { // READC
                     p.push_back(READC);
                 } else if(tokens[k] == TAB) { // READN
