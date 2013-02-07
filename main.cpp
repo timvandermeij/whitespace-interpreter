@@ -196,6 +196,164 @@ vector<Token> tokensToLabel(const vector<Token> &tokens, int &index) {
     return label;
 }
 
+void processStackManip(const vector<Token> &tokens, Program &p, int &k) {
+    if(tokens[k] == SPACE) { // PUSH
+        p.push_back(PUSH);
+        if(tokens[++k] == LINEFEED) { // No number as argument to PUSH
+            throw noNumericArg;
+        } else { // We're going to parse the number now
+            p.push_back(tokensToNumber(tokens, k));
+        }
+    } else if(tokens[k] == TAB) { // COPY or SLIDE
+        k++;
+        if(tokens[k] == SPACE) { // COPY
+            p.push_back(COPY);
+        } else if(tokens[k] == LINEFEED) { // COPY
+            p.push_back(SLIDE);
+        } else {
+            throw unreachableToken;
+        }
+        // COPY and SLIDE both require a numeric argument,
+        // so we shall try to parse a number now
+        if(tokens[++k] == LINEFEED) { // No number as argument to COPY or SLIDE
+            throw noNumericArg;
+        } else { // The actual parsing is situated in this branch
+            p.push_back(tokensToNumber(tokens, k));
+        } // Duplicated from PUSH
+    } else if(tokens[k] == LINEFEED) { // DUP, SWAP or DISCARD
+        // Could perhaps also be done more concisely
+        // with the ?:-operator, but I reckon something will go wrong
+        // in the exception branch
+        k++;
+        if(tokens[k] == SPACE) { // DUP
+            p.push_back(DUP);
+        } else if(tokens[k] == TAB) { // SWAP
+            p.push_back(SWAP);
+        } else if(tokens[k] == LINEFEED) { // DISCARD
+            p.push_back(DISCARD);
+        } else {
+            throw unreachableToken;
+        }
+    } else {
+        throw unreachableToken;
+    }
+}
+
+void processArith(const vector<Token> &tokens, Program &p, int &k) {
+    if(tokens[k] == SPACE) {
+        k++;
+        if(tokens[k] == SPACE) { // ADD
+            p.push_back(ADD);
+        } else if(tokens[k] == TAB) { // SUB
+            p.push_back(SUB);
+        } else if(tokens[k] == LINEFEED) { // MUL
+            p.push_back(MUL);
+        } else {
+            throw unreachableToken;
+        }
+    } else if(tokens[k] == TAB) {
+        k++;
+        if(tokens[k] == SPACE) { // DIV
+            p.push_back(DIV);
+        } else if(tokens[k] == TAB) { // MOD
+            p.push_back(MOD);
+        } else {
+            throw unreachableToken;
+        }
+    } else {
+        throw unreachableToken;
+    }
+}
+
+void processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
+    if(tokens[k] == SPACE) { // STORE
+        p.push_back(STORE);
+    } else if(tokens[k] == TAB) { // RETRIEVE
+        p.push_back(RETRIEVE);
+    } else {
+        throw unreachableToken;
+    }
+}
+
+void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
+    if(tokens[k] == SPACE) {
+        k++
+        if(tokens[k] == SPACE) { // MARK
+            p.push_back(MARK);
+            if(tokens[++k] == LINEFEED) { // No label as argument to MARK
+                throw noLabelArg;
+            } else { // We're going to parse the label now
+                p.push_back(tokensToNumber(tokens, k));
+            }
+        } else if(tokens[k] == TAB) { // CALL
+            p.push_back(CALL);
+            if(tokens[++k] == LINEFEED) { // No label as argument to CALL
+                throw noLabelArg;
+            } else { // We're going to parse the label now
+                p.push_back(tokensToNumber(tokens, k));
+            }
+        } else if(tokens[k] == LINEFEED) { // JUMP
+            p.push_back(JUMP);
+            if(tokens[++k] == LINEFEED) { // No label as argument to JUMP
+                throw noLabelArg;
+            } else { // We're going to parse the label now
+                p.push_back(tokensToNumber(tokens, k));
+            }
+        } else {
+            throw unreachableToken;
+        }
+    } else if(tokens[k] == TAB) {
+        k++;
+        if(tokens[k] == SPACE) { // JUMPZERO
+            p.push_back(JUMPZERO);
+            if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
+                throw noLabelArg;
+            } else { // We're going to parse the label now
+                p.push_back(tokensToNumber(tokens, k));
+            }
+        } else if(tokens[k] == TAB) { // JUMPNEG
+            p.push_back(JUMPNEG);
+            if(tokens[++k] == LINEFEED) { // No label as argument to JUMPNEG
+                throw noLabelArg;
+            } else { // We're going to parse the label now
+                p.push_back(tokensToNumber(tokens, k));
+            }
+        } else if(tokens[k] == LINEFEED) { // ENDSUB
+            p.push_back(ENDSUB);
+        } else {
+            throw unreachableToken;
+        }
+    } else if(tokens[k++] == LINEFEED && tokens[k] == LINEFEED) { // ENDPROG
+        p.push_back(ENDPROG);
+    } else {
+        throw unreachableToken;
+    }
+}
+
+void processIO(const vector<Token> &tokens, Program &p, int &k) {
+    if(tokens[k] == SPACE) {
+        k++;
+        if(tokens[k] == SPACE) { // WRITEC
+            p.push_back(WRITEC);
+        } else if(tokens[k] == TAB) { // WRITEN
+            p.push_back(WRITEN);
+        } else {
+            throw unreachableToken;
+        }
+    } else if(tokens[k] == TAB) {
+        k++;
+        if(tokens[k] == SPACE) { // READC
+            p.push_back(READC);
+        } else if(tokens[k] == TAB) { // READN
+            p.push_back(READN);
+        } else {
+            throw unreachableToken;
+        }
+    } else {
+        throw unreachableToken;
+    }
+}
+
 // Let us first complete this potentially monolithic function and refactor it afterwards.
 Program tokensToProgram(const vector<Token> &tokens) {
     int amount = tokens.size();
@@ -216,153 +374,15 @@ Program tokensToProgram(const vector<Token> &tokens) {
 
     for(int k = start; k < amount; k++) {
         if(m == STACKMANIP) {
-            if(tokens[k] == SPACE) { // PUSH
-                p.push_back(PUSH);
-                if(tokens[++k] == LINEFEED) { // No number as argument to PUSH
-                    throw noNumericArg;
-                } else { // We're going to parse the number now
-                    p.push_back(tokensToNumber(tokens, k));
-                }
-            } else if(tokens[k] == TAB) { // COPY or SLIDE
-	            k++;
-                if(tokens[k] == SPACE) { // COPY
-                    p.push_back(COPY);
-                } else if(tokens[k] == LINEFEED) { // COPY
-                    p.push_back(SLIDE);
-                } else {
-                    throw unreachableToken;
-                }
-                // COPY and SLIDE both require a numeric argument,
-                // so we shall try to parse a number now
-                if(tokens[++k] == LINEFEED) { // No number as argument to COPY or SLIDE
-                    throw noNumericArg;
-                } else { // The actual parsing is situated in this branch
-                    p.push_back(tokensToNumber(tokens, k));
-                } // Duplicated from PUSH
-            } else if(tokens[k] == LINEFEED) { // DUP, SWAP or DISCARD
-                // Could perhaps also be done more concisely
-                // with the ?:-operator, but I reckon something will go wrong
-                // in the exception branch
-	            k++;
-                if(tokens[k] == SPACE) { // DUP
-                    p.push_back(DUP);
-                } else if(tokens[k] == TAB) { // SWAP
-                    p.push_back(SWAP);
-                } else if(tokens[k] == LINEFEED) { // DISCARD
-                    p.push_back(DISCARD);
-                } else {
-                    throw unreachableToken;
-                }
-            } else {
-                throw unreachableToken;
-            }
+            processStackManip(tokens, p, k);
         } else if(m == ARITH) {
-            if(tokens[k] == SPACE) {
-                k++;
-                if(tokens[k] == SPACE) { // ADD
-                    p.push_back(ADD);
-                } else if(tokens[k] == TAB) { // SUB
-                    p.push_back(SUB);
-                } else if(tokens[k] == LINEFEED) { // MUL
-                    p.push_back(MUL);
-                } else {
-                    throw unreachableToken;
-                }
-            } else if(tokens[k] == TAB) {
-                k++;
-                if(tokens[k] == SPACE) { // DIV
-                    p.push_back(DIV);
-                } else if(tokens[k] == TAB) { // MOD
-                    p.push_back(MOD);
-                } else {
-                    throw unreachableToken;
-                }
-            } else {
-                throw unreachableToken;
-            }
+            processArith(tokens, p, k);
         } else if(m == HEAPACC) {
-            if(tokens[k] == SPACE) { // STORE
-                p.push_back(STORE);
-            } else if(tokens[k] == TAB) { // RETRIEVE
-                p.push_back(RETRIEVE);
-            } else {
-                throw unreachableToken;
-            }
+            processHeapAcc(tokens, p, k);
         } else if(m == FLOWCONT) {
-            if(tokens[k] == SPACE) {
-                k++
-                if(tokens[k] == SPACE) { // MARK
-                    p.push_back(MARK);
-                    if(tokens[++k] == LINEFEED) { // No label as argument to MARK
-                        throw noLabelArg;
-                    } else { // We're going to parse the label now
-                        p.push_back(tokensToNumber(tokens, k));
-                    }
-                } else if(tokens[k] == TAB) { // CALL
-                    p.push_back(CALL);
-                    if(tokens[++k] == LINEFEED) { // No label as argument to CALL
-                        throw noLabelArg;
-                    } else { // We're going to parse the label now
-                        p.push_back(tokensToNumber(tokens, k));
-                    }
-                } else if(tokens[k] == LINEFEED) { // JUMP
-                    p.push_back(JUMP);
-                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMP
-                        throw noLabelArg;
-                    } else { // We're going to parse the label now
-                        p.push_back(tokensToNumber(tokens, k));
-                    }
-                } else {
-                    throw unreachableToken;
-                }
-            } else if(tokens[k] == TAB) {
-	            k++;
-                if(tokens[k] == SPACE) { // JUMPZERO
-                    p.push_back(JUMPZERO);
-                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
-                        throw noLabelArg;
-                    } else { // We're going to parse the label now
-                        p.push_back(tokensToNumber(tokens, k));
-                    }
-                } else if(tokens[k] == TAB) { // JUMPNEG
-                    p.push_back(JUMPNEG);
-                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMPNEG
-                        throw noLabelArg;
-                    } else { // We're going to parse the label now
-                        p.push_back(tokensToNumber(tokens, k));
-                    }
-                } else if(tokens[k] == LINEFEED) { // ENDSUB
-                    p.push_back(ENDSUB);
-                } else {
-                    throw unreachableToken;
-                }
-            } else if(tokens[k++] == LINEFEED && tokens[k] == LINEFEED) { // ENDPROG
-                p.push_back(ENDPROG);
-            } else {
-                throw unreachableToken;
-            }
+            processFlowCont(tokens, p, k);
         } else if(m == IO) {
-            if(tokens[k] == SPACE) {
-	            k++;
-                if(tokens[k] == SPACE) { // WRITEC
-                    p.push_back(WRITEC);
-                } else if(tokens[k] == TAB) { // WRITEN
-                    p.push_back(WRITEN);
-                } else {
-                    throw unreachableToken;
-                }
-            } else if(tokens[k] == TAB) {
-	            k++;
-                if(tokens[k] == SPACE) { // READC
-                    p.push_back(READC);
-                } else if(tokens[k] == TAB) { // READN
-                    p.push_back(READN);
-                } else {
-                    throw unreachableToken;
-                }
-            } else {
-                throw unreachableToken;
-            }
+            processIO(tokens, p, k);
         } else {
             throw unreachableToken;
         }
