@@ -102,15 +102,15 @@ void printTokens(const vector<Token> &tokens) {
                 cout << "LF" << endl;
                 break;
             case SPACE:
-                cout << "S ";
+                cout << "S";
                 break;
             case TAB:
-                cout << "T ";
+                cout << "T";
                 break;
         }
-        /*if(length != k + 1) {
+        if(length != k + 1) {
             cout << ":";
-        }*/
+        }
     }
 }
 
