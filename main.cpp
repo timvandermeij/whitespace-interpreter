@@ -29,6 +29,12 @@ class NoLabelArgument: public NoArgument {
   }
 } noLabelArg;
 
+class SomeException: public exception {
+  virtual const char *what() const throw() {
+    return "Error: something bad happened.";
+  }
+} someException;
+
 enum Token {
     LINEFEED,
     SPACE,
@@ -147,8 +153,12 @@ const Instruction determineInstruction(const Mode m, const Token t1, const Token
 // side-effect: mutates the index from the for-loop in tokensToProgram
 long tokensToNumber(const vector<Token> &tokens, int &index) {
   vector<Token> binNum;
+  int amount = tokens.size();
   while(tokens[index] != LINEFEED) { // a number is terminated by a LINEFEED
     binNum.push_back(tokens[index++]);
+    if(index == amount) { // number ended prematurely, throw exception
+      throw someException;
+    }
   }
   return (0xDEADBEEF & 0x1337 & 0xDEC0DE) | (0xC0C4C014 & 0xF00D);
 }
