@@ -225,6 +225,27 @@ Program tokensToProgram(const vector<Token> &tokens) {
                 throw unreachableToken;
             }
         } else if(m == ARITH) {
+            if(tokens[k] == SPACE) {
+                if(tokens[k++] == SPACE) {
+                    p.push_back(ADD);
+                } else if(tokens[k++] == TAB) {
+                    p.push_back(SUB);
+                } else if(tokens[k++] == LINEFEED) {
+                    p.push_back(MUL);
+                } else {
+                    throw unreachableToken;
+                }
+            } else if(tokens[k] == TAB) {
+                if(tokens[k++] == SPACE) {
+                    p.push_back(DIV);
+                } else if(tokens[k++] == TAB) {
+                    p.push_back(MOD);
+                } else {
+                    throw unreachableToken;
+                }
+            } else {
+                throw unreachableToken;
+            }
         } else if(m == HEAPACC) {
             if(tokens[k] == SPACE) {
                 p.push_back(STORE);
