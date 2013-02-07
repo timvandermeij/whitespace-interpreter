@@ -254,9 +254,17 @@ Program tokensToProgram(const vector<Token> &tokens) {
             } else {
                 throw unreachableToken;
             }
-        } else if(m == FLOWCONT) {
-            if(tokens[k] == LINEFEED && tokens[k++] == LINEFEED) {
-                exit(0);
+        } else if(m == FLOWCONT) { // Needs to be completed
+            if(tokens[k] == TAB) {
+                if(tokens[k++] == LINEFEED) {
+                    p.push_back(ENDSUB);
+                } else {
+                    throw unreachableToken;
+                }
+            } else if(tokens[k] == LINEFEED && tokens[k++] == LINEFEED) {
+                p.push_back(ENDPROG);
+            } else {
+                throw unreachableToken;
             }
         } else if(m == IO) {
             if(tokens[k] == SPACE) {
