@@ -218,7 +218,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
         if(m == STACKMANIP) {
             if(tokens[k] == SPACE) { // PUSH
                 p.push_back(PUSH);
-                if(tokens[k++] == LINEFEED) { // No number as argument to PUSH
+                if(tokens[++k] == LINEFEED) { // No number as argument to PUSH
                     throw noNumericArg;
                 } else { // We're going to parse the number now
                     p.push_back(tokensToNumber(tokens, k));
@@ -234,7 +234,7 @@ Program tokensToProgram(const vector<Token> &tokens) {
                 }
                 // COPY and SLIDE both require a numeric argument,
                 // so we shall try to parse a number now
-                if(tokens[k++] == LINEFEED) { // No number as argument to COPY or SLIDE
+                if(tokens[++k] == LINEFEED) { // No number as argument to COPY or SLIDE
                     throw noNumericArg;
                 } else { // The actual parsing is situated in this branch
                     p.push_back(tokensToNumber(tokens, k));
@@ -290,21 +290,22 @@ Program tokensToProgram(const vector<Token> &tokens) {
             }
         } else if(m == FLOWCONT) { // Needs to be completed
             if(tokens[k] == TAB) {
-                if(tokens[k++] == SPACE) { // JUMPZERO
+	        k++;
+                if(tokens[k] == SPACE) { // JUMPZERO
                     p.push_back(JUMPZERO);
-                    if(tokens[k + 2] == LINEFEED) { // No label as argument to JUMPZERO
+                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
                         throw noLabelArg;
                     } else { // We're going to parse the label now
                         p.push_back(tokensToLabel(tokens, k));
                     }
-                } else if(tokens[k++] == TAB) { // JUMPNEG
+                } else if(tokens[k] == TAB) { // JUMPNEG
                     p.push_back(JUMPNEG);
-                    if(tokens[k + 2] == LINEFEED) { // No label as argument to JUMPZERO
+                    if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
                         throw noLabelArg;
                     } else { // We're going to parse the label now
                         p.push_back(tokensToLabel(tokens, k));
                     }
-                } else if(tokens[k++] == LINEFEED) { // ENDSUB
+                } else if(tokens[k] == LINEFEED) { // ENDSUB
                     p.push_back(ENDSUB);
                 } else {
                     throw unreachableToken;
