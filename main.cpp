@@ -64,7 +64,7 @@ class Interpreter {
   private:
     vector<Instruction> program;
     vector<int> heap;
-    vector<int> stack; //
+    vector<int> stack; // used to store values
     vector<int> callStack; // to remember where to return to
     unsigned pc; // program counter
 };
