@@ -296,14 +296,14 @@ Program tokensToProgram(const vector<Token> &tokens) {
                     if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
                         throw noLabelArg;
                     } else { // We're going to parse the label now
-                        p.push_back(tokensToLabel(tokens, k));
+                        p.push_back(tokensToNumber(tokens, k));
                     }
                 } else if(tokens[k] == TAB) { // JUMPNEG
                     p.push_back(JUMPNEG);
                     if(tokens[++k] == LINEFEED) { // No label as argument to JUMPZERO
                         throw noLabelArg;
                     } else { // We're going to parse the label now
-                        p.push_back(tokensToLabel(tokens, k));
+                        p.push_back(tokensToNumber(tokens, k));
                     }
                 } else if(tokens[k] == LINEFEED) { // ENDSUB
                     p.push_back(ENDSUB);
