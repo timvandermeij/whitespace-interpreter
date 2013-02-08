@@ -524,8 +524,10 @@ Program tokensToProgram(const vector<Token> &tokens) {
     int start = ((m == FLOWCONT || m == STACKMANIP) ? 1 : 2);
 
     for(int k = start; k < amount; k++) {
-        if(k == amount)
-	  cout << "k has reached max" << endl;
+        if(k == amount) {
+	        cout << "k has reached max" << endl; // We might want to use an exception here...
+        }
+
         if(m == STACKMANIP) {
             processStackManip(tokens, p, k);
         } else if(m == ARITH) {
@@ -540,60 +542,60 @@ Program tokensToProgram(const vector<Token> &tokens) {
             throw unreachableToken;
         }
         k++; // Proceed to next instruction
-	if(k != amount) {
-	  m = determineMode(tokens[k], tokens[k + 1]);
-	  if(!(m == STACKMANIP || m == FLOWCONT)) {
-            k++;
-	  }
-	}
+	    if(k != amount) {
+	        m = determineMode(tokens[k], tokens[k + 1]);
+	        if(!(m == STACKMANIP || m == FLOWCONT)) {
+                k++;
+	        }
+	    }
     }
     return p;
 }
 
 string programToString(Program p) {
-  int size = p.size();
-  string s;
-  for(int k = 0; k < size; k++) {
-    switch(p[k]) {
-      case PUSH: s.append("PUSH "); break;
-      case DUP: s.append("DUP"); break;
-      case COPY: s.append("COPY "); break;
-      case SWAP: s.append("SWAP"); break;
-      case DISCARD: s.append("DISCARD"); break;
-      case SLIDE: s.append("SLIDE "); break;
-      case ADD: s.append("ADD"); break;
-      case SUB: s.append("SUB"); break;
-      case MUL: s.append("MUL"); break;
-      case DIV: s.append("DIV"); break;
-      case MOD: s.append("MOD"); break;
+    int size = p.size();
+    string s;
 
-      case STORE: s.append("STORE"); break;
-      case RETRIEVE: s.append("RETRIEVE"); break;
+    for(int k = 0; k < size; k++) {
+        switch(p[k]) {
+            case PUSH: s.append("PUSH "); break;
+            case DUP: s.append("DUP"); break;
+            case COPY: s.append("COPY "); break;
+            case SWAP: s.append("SWAP"); break;
+            case DISCARD: s.append("DISCARD"); break;
+            case SLIDE: s.append("SLIDE "); break;
+            case ADD: s.append("ADD"); break;
+            case SUB: s.append("SUB"); break;
+            case MUL: s.append("MUL"); break;
+            case DIV: s.append("DIV"); break;
+            case MOD: s.append("MOD"); break;
 
-      case MARK: s.append("MARK"); break;
-      case CALL: s.append("CALL"); break;
-      case JUMP: s.append("JUMP"); break;
-      case JUMPZERO: s.append("JUMPZERO"); break;
-      case JUMPNEG: s.append("JUMPNEG"); break;
-      case ENDSUB: s.append("ENDSUB"); break;
-      case ENDPROG: s.append("ENDPROG"); break;
+            case STORE: s.append("STORE"); break;
+            case RETRIEVE: s.append("RETRIEVE"); break;
 
-      case WRITEC: s.append("WRITEC"); break;
-      case WRITEN: s.append("WRITEN"); break;
-      case READC: s.append("READC"); break;
-      case READN: s.append("READN"); break;
-      default: throw instructionNotFoundException;
+            case MARK: s.append("MARK"); break;
+            case CALL: s.append("CALL"); break;
+            case JUMP: s.append("JUMP"); break;
+            case JUMPZERO: s.append("JUMPZERO"); break;
+            case JUMPNEG: s.append("JUMPNEG"); break;
+            case ENDSUB: s.append("ENDSUB"); break;
+            case ENDPROG: s.append("ENDPROG"); break;
+
+            case WRITEC: s.append("WRITEC"); break;
+            case WRITEN: s.append("WRITEN"); break;
+            case READC: s.append("READC"); break;
+            case READN: s.append("READN"); break;
+            default: throw instructionNotFoundException;
+        }
+        switch(p[k]) {
+		    case PUSH: case COPY: case SLIDE: case MARK:
+		    case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
+		        s.append(to_string(p[++k])); break;
+		    default: break;
+        }
+        s.append("\n");
     }
-    switch(p[k]) {
-		case PUSH: case COPY: case SLIDE: case MARK:
-		case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
-			s.append(to_string(p[++k])); break;
-		default: break;
-		
-    }
-    s.append("\n");
-  }
-  return s;
+    return s;
 }
 
 int main() {
