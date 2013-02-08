@@ -80,6 +80,21 @@ enum Instruction {
 
 typedef vector<Instruction> Program;
 
+class Parser {
+    public:
+        vector<Token> tokenize(const string &);
+        Program tokensToProgram(const vector<Token> &);
+
+    private:
+        long tokensToNumber(const vector<Token> &, int &);
+        void parseNumber(const vector<Token> &, Program &, int &);
+        void processStackManip(const vector<Token> &, Program &, int &);
+        void processArith(const vector<Token> &, Program &, int &);
+        void processHeapAcc(const vector<Token> &, Program &, int &);
+        void processFlowCont(const vector<Token> &, Program &, int &);
+        void processIO(const vector<Token> &, Program &, int &);
+};
+
 class Interpreter {
     public:
         Interpreter(Program);
@@ -98,172 +113,205 @@ Interpreter::Interpreter(Program p) {
 }
 
 void Interpreter::interpret() {
-    unsigned pc, size = p.size();
+    unsigned pc, oldPc, size = p.size();
 
     for(pc = 0; pc < size; pc++) {
         switch(p[pc]) {
-        // Stack manipulations
-	    case PUSH: {
-            stack.push_front(p[++pc]);
-            break;
-	    }
-	    case DUP: {
-            stack.push_front(stack.front());
-            break;
-	    }
-	    case COPY: {
-            auto it = stack.begin();
-            advance(it, p[++pc]);
-            stack.push_front(*it);
-            break;
-        }
-	    case SWAP: {
-            Instruction first, second;
-            first = stack.front();
-            stack.pop_front();
-            second = stack.front();
-            stack.pop_front();
-            stack.push_front(first);
-            stack.push_front(second);
-            break;
-        }
-	    case DISCARD: {
-            stack.pop_front();
-            break;
-        }
-	    case SLIDE: {
-            Instruction top;
-            top = stack.front();
-            ++pc;
-            for(int i = 0; i <= p[pc]; i++) {
+            // Stack manipulations
+            case PUSH: {
+                stack.push_front(p[++pc]);
+                break;
+            }
+            case DUP: {
+                stack.push_front(stack.front());
+                break;
+            }
+            case COPY: {
+                auto it = stack.begin();
+                advance(it, p[++pc]);
+                stack.push_front(*it);
+                break;
+            }
+            case SWAP: {
+                Instruction first, second;
+                first = stack.front();
                 stack.pop_front();
+                second = stack.front();
+                stack.pop_front();
+                stack.push_front(first);
+                stack.push_front(second);
+                break;
             }
-            stack.push_front(top);
-            break;
-	    }
-
-        // Arithmetic
-	    case ADD: {
-            int a = stack.front();
-            stack.pop_front();
-            int b = stack.front();
-            stack.pop_front();
-            stack.push_front(b + a);
-            break;
-        }
-	    case SUB: {
-            int a = stack.front();
-            stack.pop_front();
-            int b = stack.front();
-            stack.pop_front();
-            stack.push_front(b - a);
-            break;
-	    }
-	    case MUL: {
-            int a = stack.front();
-            stack.pop_front();
-            int b = stack.front();
-            stack.pop_front();
-            stack.push_front(b * a);
-            break;
+            case DISCARD: {
+                stack.pop_front();
+                break;
             }
-	    case DIV: {
-            int a = stack.front();
-            stack.pop_front();
-            int b = stack.front();
-            stack.pop_front();
-            stack.push_front(b / a);
-            break;
-	    }
-	    case MOD: {
-            int a = stack.front();
-            stack.pop_front();
-            int b = stack.front();
-            stack.pop_front();
-            stack.push_front(b % a);
-            break;
-        }
-
-        // Heap access
-	    case STORE: {
-            int value = stack.front();
-            stack.pop_front();
-            int address = stack.front();
-            if(address < 0) {
-                throw outOfBoundsException;
-            }
-            int size = heap.size();
-            if(size < address) {
-                for(int i = size; i < address; i++) {
-                    heap.push_back(0);
+            case SLIDE: {
+                Instruction top;
+                top = stack.front();
+                ++pc;
+                for(int i = 0; i <= p[pc]; i++) {
+                    stack.pop_front();
                 }
+                stack.push_front(top);
+                break;
             }
-            heap.push_back(value);
-            break;
-        }
-	    case RETRIEVE: {
-            int size = heap.size();
-            int address = stack.front();
-            stack.pop_front();
-            if((size < address) || (address < 0)) {
-                throw outOfBoundsException;
-            } else {
-                stack.push_front(heap[address]);
-            }
-            break;
-        }
 
-        // Flow control
-	    case MARK: {
-            int label = p[++pc];
-            labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
-            break;
-        }
-	    case CALL: {
-            int label = p[++pc];
-            auto pair = labels.find(label);
-            if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
-                throw labelNotFoundException;
+            // Arithmetic
+            case ADD: {
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b + a);
+                break;
             }
-            pc = pair->second;
-            break;
-	    }
-	    case JUMP: {
-	    	break;
-	    }
-	    case JUMPZERO: {
-	    	break;
-	    }
-	    case JUMPNEG: {
-	    	break;
-	    }
-	    case ENDSUB: {
-	    	break;
-	    }
-	    case ENDPROG: {
-	    	break;
-	    }
-	    
-	    // I/O operations
-	    case WRITEC: {
-	    	break;
-	    }
-	    case WRITEN: {
-	    	break;
-	    }
-	    case READC: {
-	    	break;
-	    }
-	    case READN: {
-	    	break;
-	    }
+            case SUB: {
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b - a);
+                break;
+            }
+            case MUL: {
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b * a);
+                break;
+                }
+            case DIV: {
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b / a);
+                break;
+            }
+            case MOD: {
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b % a);
+                break;
+            }
+
+            // Heap access
+            case STORE: {
+                int value = stack.front();
+                stack.pop_front();
+                int address = stack.front();
+                if(address < 0) {
+                    throw outOfBoundsException;
+                }
+                int size = heap.size();
+                if(size < address) {
+                    for(int i = size; i < address; i++) {
+                        heap.push_back(0);
+                    }
+                }
+                heap.push_back(value);
+                break;
+            }
+            case RETRIEVE: {
+                int size = heap.size();
+                int address = stack.front();
+                stack.pop_front();
+                if((size < address) || (address < 0)) {
+                    throw outOfBoundsException;
+                } else {
+                    stack.push_front(heap[address]);
+                }
+                break;
+            }
+
+            // Flow control
+            case MARK: {
+                int label = p[++pc];
+                labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
+                break;
+            }
+            case CALL: { // Not sure what the difference is between CALL and JUMP. I think this CALL function should actually execute a function...
+                int label = p[++pc];
+                auto pair = labels.find(label);
+                if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                    throw labelNotFoundException;
+                }
+                oldPc = pc;
+                pc = pair->second;
+                break;
+            }
+            case JUMP: {
+                int label = p[++pc];
+                auto pair = labels.find(label);
+                if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                    throw labelNotFoundException;
+                }
+                oldPc = pc;
+                pc = pair->second;
+                break;
+            }
+            case JUMPZERO: {
+                if(stack.front() == 0) {
+                    int label = p[++pc];
+                    auto pair = labels.find(label);
+                    if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                        throw labelNotFoundException;
+                    }
+                    oldPc = pc;
+                    pc = pair->second;
+                }
+                break;
+            }
+            case JUMPNEG: {
+                if(stack.front() < 0) {
+                    int label = p[++pc];
+                    auto pair = labels.find(label);
+                    if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                        throw labelNotFoundException;
+                    }
+                    oldPc = pc;
+                    pc = pair->second;
+                }
+                break;
+            }
+            case ENDSUB: {
+                pc = oldPc;
+                oldPc = 0;
+                break;
+            }
+            case ENDPROG: {
+                exit(0);
+            }
+
+            // I/O operations
+            case (WRITEC || WRITEN): {
+                cout << stack.front() << endl;
+                stack.pop_front();
+                break;
+            }
+            case READC: {
+                char character;
+                cin >> character;
+                heap.push_back(character);
+                break;
+            }
+            case READN: {
+                int number;
+                cin >> number;
+                heap.push_back(number);
+                break;
+            }
             default:
                 throw instructionNotFoundException;
         }
     }
 }
 
-vector<Token> tokenise(const string &program) {
+vector<Token> Parser::tokenize(const string &program) {
     vector<Token> tokens;
 
     for(auto k = program.begin(); k != program.end(); k++) {
@@ -300,21 +348,6 @@ void printTokens(const vector<Token> &tokens) {
     }
 }
 
-const string readFile(const string filename) {
-    string line, fileContents;
-    ifstream input;
-
-    input.open(filename.c_str());
-    if (input.is_open()) {
-        while (!input.eof()) {
-            getline(input, line);
-            fileContents.append(line);
-            fileContents.append("\n");
-        }
-    }
-    return fileContents;
-}
-
 // Note: could be implemented using some sort of lookup table
 // data structure indexed by a pair of enums.
 const Mode determineMode(const Token t1, const Token t2) {
@@ -341,7 +374,7 @@ const Mode determineMode(const Token t1, const Token t2) {
 
 // Side-effect: mutates the index from the for-loop in tokensToProgram
 // Labels are also represented as numbers, so labels will be handled as well.
-long tokensToNumber(const vector<Token> &tokens, int &index) {
+long Parser::tokensToNumber(const vector<Token> &tokens, int &index) {
     vector<Token> binNum;
     int amount = tokens.size();
     int sign;
@@ -368,7 +401,7 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     return sign * sum;
 }
 
-void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::parseNumber(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[++k] == LINEFEED) { // No label as argument
         throw noLabelArg;
     } else { // We're going to parse the label now
@@ -376,7 +409,7 @@ void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void processStackManip(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processStackManip(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) { // PUSH
         p.push_back(PUSH);
         parseNumber(tokens, p, k);
@@ -411,7 +444,7 @@ void processStackManip(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void processArith(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processArith(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) {
         k++;
         if(tokens[k] == SPACE) { // ADD
@@ -437,7 +470,7 @@ void processArith(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) { // STORE
         p.push_back(STORE);
     } else if(tokens[k] == TAB) { // RETRIEVE
@@ -447,7 +480,7 @@ void processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) {
         k++;
         if(tokens[k] == SPACE) { // MARK
@@ -482,7 +515,7 @@ void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void processIO(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processIO(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) {
         k++;
         if(tokens[k] == SPACE) { // WRITEC
@@ -506,7 +539,7 @@ void processIO(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-Program tokensToProgram(const vector<Token> &tokens) {
+Program Parser::tokensToProgram(const vector<Token> &tokens) {
     int amount = tokens.size();
     if(amount < 3) {
         exit(0); // Empty program
@@ -598,13 +631,38 @@ string programToString(Program p) {
     return s;
 }
 
+const string readFile(const string filename) {
+    string line, fileContents;
+    ifstream input;
+
+    input.open(filename.c_str());
+    if (input.is_open()) {
+        while (!input.eof()) {
+            getline(input, line);
+            fileContents.append(line);
+            fileContents.append("\n");
+        }
+    }
+    return fileContents;
+}
+
 int main() {
+    Parser parser;
+    Interpreter interpreter;
+
+    // Load the Whitespace source file and tokenize it.
     string fileContents = readFile("hello_world.ws");
-    auto tokens = tokenise(fileContents);
+    auto tokens = parser.tokenize(fileContents);
     printTokens(tokens);
     cout << endl;
-    auto program = tokensToProgram(tokens);
+
+    // Print the tokens in an assembly-like way.
+    auto program = parser.tokensToProgram(tokens);
     string textrep = programToString(program);
     cout << textrep << endl;
+
+    // Interpret the Whitespace source file.
+    interpreter.interpret();
+
     return 0;
 }
