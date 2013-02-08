@@ -181,7 +181,7 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     for(int k = binNum.size() - 1; k >= 0; k++) {
     	sum += binNum[k] == TAB ? pow(2, k) : 0;
     }
-    return sign * sum; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
+    return sign * sum;
 }
 
 void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
