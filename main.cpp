@@ -108,9 +108,6 @@ void printTokens(const vector<Token> &tokens) {
                 cout << "T ";
                 break;
         }
-        /*if(length != k + 1) {
-            cout << ":";
-        }*/
     }
 }
 
@@ -130,7 +127,7 @@ const string readFile(const string filename) {
 }
 
 // Note: could be implemented using some sort of lookup table
-//       data structure indexed by a pair of enums.
+// data structure indexed by a pair of enums.
 const Mode determineMode(const Token t1, const Token t2) {
     switch(t1) {
         case LINEFEED:
