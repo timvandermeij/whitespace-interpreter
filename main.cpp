@@ -6,6 +6,9 @@
 #include <fstream>
 #include <exception>
 #include <cmath>
+#include <list>
+#include <map>
+
 using namespace std;
 
 class UnreachableToken: public exception {
@@ -29,17 +32,35 @@ class NoLabelArgument: public NoArgument {
     }
 } noLabelArg;
 
-class prematureEndException: public exception {
+class OutOfBoundsException: public NoArgument {
+    virtual const char *what() const throw () {
+        return "Error: index out of bounds.";
+    }
+} outOfBoundsException;
+
+class PrematureEndException: public exception {
     virtual const char *what() const throw () {
         return "Error: number or label ended prematurely.";
     }
 } prematureEndException;
 
-class undefinedSignException: public exception {
+class UndefinedSignException: public exception {
     virtual const char *what() const throw () {
         return "Error: sign of the number is undefined.";
     }
 } undefinedSignException;
+
+class InstructionNotFoundException: public exception {
+    virtual const char *what() const throw () {
+        return "Error: instruction has not been found.";
+    }
+} instructionNotFoundException;
+
+class LabelNotFoundException: public exception {
+    virtual const char *what() const throw () {
+        return "Error: label has not been found.";
+    }
+} labelNotFoundException;
 
 enum Token {
     LINEFEED, SPACE, TAB
@@ -61,14 +82,142 @@ typedef vector<Instruction> Program;
 
 class Interpreter {
     public:
+        Interpreter(Program);
+        void interpret();
 
     private:
-        Program program; // Contains instructions from the Whitespace source
+        Program p; // Contains instructions from the Whitespace source
         vector<int> heap;
-        vector<int> stack; // To store values
+        list<int> stack; // To store values
         vector<int> callStack; // To remember where to return to
-        unsigned pc; // Program counter
+        map<int, unsigned> labels; // Lookup table for labels
 };
+
+Interpreter::Interpreter(Program p) {
+    this->p = p;
+}
+
+void Interpreter::interpret() {
+    unsigned pc, size = p.size();
+
+    for(pc = 0; pc < size; pc++) {
+        switch(p[pc]) {
+            // Stack manipulations
+            case PUSH:
+                stack.push_front(p[++pc]);
+                break;
+            case DUP:
+                stack.push_front(stack.front());
+                break;
+            case COPY:
+                auto it = stack.begin();
+                advance(it, p[++pc]);
+                stack.push_front(*it);
+                break;
+            case SWAP:
+                Instruction first, second;
+                first = stack.front();
+                stack.pop_front();
+                second = stack.front();
+                stack.pop_front();
+                stack.push_front(first);
+                stack.push_front(second);
+                break;
+            case DISCARD:
+                stack.pop_front();
+                break;
+            case SLIDE:
+                Instruction top;
+                top = stack.front();
+                ++pc;
+                for(int i = 0; i <= p[pc]; i++) {
+                    stack.pop_front();
+                }
+                stack.push_front(top);
+                break;
+
+            // Arithmetic
+            case ADD:
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b + a);
+                break;
+            case SUB:
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b - a);
+                break;
+            case MUL:
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b * a);
+                break;
+            case DIV:
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b / a);
+                break;
+            case MOD:
+                int a = stack.front();
+                stack.pop_front();
+                int b = stack.front();
+                stack.pop_front();
+                stack.push_front(b % a);
+                break;
+
+            // Heap access
+            case STORE:
+                int value = stack.front();
+                stack.pop_front();
+                int address = stack.front();
+                if(address < 0) {
+                    throw outOfBoundsException;
+                }
+                int size = heap.size();
+                if(size < address) {
+                    for(int i = size; i < address; i++) {
+                        heap.push_back(0);
+                    }
+                }
+                heap.push_back(value);
+                break;
+            case RETRIEVE:
+                int size = heap.size();
+                int address = stack.front();
+                stack.pop_front();
+                if((size < address) || (address < 0)) {
+                    throw outOfBoundsException;
+                } else {
+                    stack.push_front(heap[address]);
+                }
+                break;
+
+            // Flow control
+            case MARK:
+                int label = p[++pc];
+                labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
+                break;
+            case CALL:
+                int label = p[++pc];
+                auto pair = labels.find(label);
+                if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
+                    throw labelNotFoundException;
+                }
+                pc = pair->second;
+                break;
+            default:
+                throw instructionNotFoundException;
+        }
+    }
+}
 
 vector<Token> tokenise(const string &program) {
     vector<Token> tokens;
