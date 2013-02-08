@@ -5,7 +5,7 @@
 #include <string>
 #include <fstream>
 #include <exception>
-
+#include <cmath>
 using namespace std;
 
 class UnreachableToken: public exception {
@@ -155,15 +155,12 @@ const Mode determineMode(const Token t1, const Token t2) {
     }
 }
 
-const Instruction determineInstruction(const Mode m, const Token t1, const Token t2) {
-
-}
-
 // Side-effect: mutates the index from the for-loop in tokensToProgram
 long tokensToNumber(const vector<Token> &tokens, int &index) {
     vector<Token> binNum;
     int amount = tokens.size();
     int sign;
+    long sum = 0;
 
     while(tokens[index] != LINEFEED) { // A number is terminated by a LINEFEED
         binNum.push_back(tokens[index++]);
@@ -179,21 +176,11 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     } else {
         throw undefinedSignException;
     }
-    return 1; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
-}
-
-// Side-effect: mutates the index from the for-loop in tokensToProgram
-vector<Token> tokensToLabel(const vector<Token> &tokens, int &index) {
-    vector<Token> label;
-    int amount = tokens.size();
-
-    while(tokens[index] != LINEFEED) { // A label is terminated by a LINEFEED
-        label.push_back(tokens[index++]);
-        if(index == amount) {
-            throw prematureEndException;
-        }
+    binNum.erase(binNum.begin()); // Pop the sign bit
+    for(int k = binNum.size() - 1; k >= 0; k++) {
+    	sum += binNum[k] == TAB ? pow(2, k) : 0;
     }
-    return label;
+    return sign * sum; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
 }
 
 void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
