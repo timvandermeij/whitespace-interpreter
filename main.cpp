@@ -57,10 +57,6 @@ enum Instruction {
     WRITEC, WRITEN, READC, READN // I/O operations
 };
 
-enum Signs {
-    POSITIVE, NEGATIVE
-};
-
 typedef vector<Instruction> Program;
 
 class Interpreter {
@@ -145,10 +141,8 @@ const Mode determineMode(const Token t1, const Token t2) {
                 default:
                     throw unreachableToken;
             }
-            break;
         default:
             throw unreachableToken;
-            break;
     }
 }
 
@@ -168,9 +162,9 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     }
 
     if(binNum.front() == SPACE) {
-        sign = POSITIVE;
+        sign = 1;
     } else if(binNum.front() == TAB) {
-        sign = NEGATIVE;
+        sign = -1;
     } else {
         throw undefinedSignException;
     }
