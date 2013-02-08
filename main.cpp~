@@ -57,10 +57,6 @@ enum Instruction {
     WRITEC, WRITEN, READC, READN // I/O operations
 };
 
-enum Signs {
-    POSITIVE, NEGATIVE
-};
-
 typedef vector<Instruction> Program;
 
 class Interpreter {
@@ -151,7 +147,6 @@ const Mode determineMode(const Token t1, const Token t2) {
             break;
         default:
             throw unreachableToken;
-            break;
     }
 }
 
@@ -171,21 +166,17 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     }
 
     if(binNum.front() == SPACE) {
-        sign = POSITIVE;
+        sign = 1;
     } else if(binNum.front() == TAB) {
-        sign = NEGATIVE;
+        sign = -1;
     } else {
         throw undefinedSignException;
     }
-<<<<<<< HEAD
     binNum.erase(binNum.begin()); // Pop the sign bit
     for(int k = binNum.size() - 1; k >= 0; k++) {
     	sum += binNum[k] == TAB ? pow(2, k) : 0;
     }
     return sign * sum; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
-=======
-    return 1; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
->>>>>>> 7b3b826528f316e8bfb18d2f638d09aa3fd8d4d4
 }
 
 void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
