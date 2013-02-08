@@ -1,0 +1,112 @@
+S S S S LF
+S S S T S S T S S S LF
+T T S S S S T LF
+S S S T T S S T S T LF
+T T S S S S T S LF
+S S S T T S T T S S LF
+T T S S S S T T LF
+S S S T T S T T S S LF
+T T S S S S T S S LF
+S S S T T S T T T T LF
+T T S S S S T S T LF
+S S S T S T T S S LF
+T T S S S S T T S LF
+S S S T S S S S S LF
+T T S S S S T T T LF
+S S S T T T S T T T LF
+T T S S S S T S S S LF
+S S S T T S T T T T LF
+T T S S S S T S S T LF
+S S S T T T S S T S LF
+T T S S S S T S T S LF
+S S S T T S T T S S LF
+T T S S S S T S T T LF
+S S S T T S S T S S LF
+T T S S S S T T S S LF
+S S S T S S S S S LF
+T T S S S S T T S T LF
+S S S T T S T T T T LF
+T T S S S S T T T S LF
+S S S T T S S T T S LF
+T T S S S S T T T T LF
+S S S T S S S S S LF
+T T S S S S T S S S S LF
+S S S T T T S S T T LF
+T T S S S S T S S S T LF
+S S S T T T S S S S LF
+T T S S S S T S S T S LF
+S S S T T S S S S T LF
+T T S S S S T S S T T LF
+S S S T T S S S T T LF
+T T S S S S T S T S S LF
+S S S T T S S T S T LF
+T T S S S S T S T S T LF
+S S S T T T S S T T LF
+T T S S S S T S T T S LF
+S S S T S S S S T LF
+T T S S S S T S T T T LF
+S S S S LF
+T T S S S S S LF
+LF
+S T S T T T S T T T S T T T S S T S S T T S T S S T S T T T S T S S S T T S S T S T LF
+LF
+S T S T T S T T T S S T T S S T S T S T T T S T T T S T T S T T S S S T T S T S S T S T T S T T T S S T T S S T S T LF
+LF
+LF
+LF
+LF
+S S S T T S S S S T S T T S S T S S S T T S S T S S LF
+T S S S LF
+T LF
+LF
+S S S T T T S T T T S T T T S S T S S T T S T S S T S T T T S T S S S T T S S T S T LF
+S LF
+S T T T S LF
+S LF
+T S S T T T S T T T S T T T S S T S S T T S T S S T S T T T S T S S S T T S S T S T S T S T T T T T S T T S S T S T S T T S T T T S S T T S S T S S LF
+T LF
+S S S S S T LF
+T S S S LF
+S LF
+S T T T S T T T S T T T S S T S S T T S T S S T S T T T S T S S S T T S S T S T LF
+LF
+S S S T T T S T T T S T T T S S T S S T T S T S S T S T T T S T S S S T T S S T S T S T S T T T T T S T T S S T S T S T T S T T T S S T T S S T S S LF
+S LF
+LF
+S LF
+LF
+LF
+T LF
+LF
+S S S T T T S S T S S T T S S T S T S T T S S S S T S T T S S T S S LF
+S LF
+S S LF
+S T LF
+T S T T T S LF
+S S S S T S T S LF
+T S S T LF
+T S S T T T S S T S S T T S S T S T S T T S S S S T S T T S S T S S S T S T T T T T S T T S S T S T S T T S T T T S S T T S S T S S LF
+S LF
+LF
+S S S T LF
+T S S S LF
+S LF
+S T T T S S T S S T T S S T S T S T T S S S S T S T T S S T S S LF
+LF
+S S S T T T S S T S S T T S S T S T S T T S S S S T S T T S S T S S S T S T T T T T S T T S S T S T S T T S T T T S S T T S S T S S LF
+S LF
+LF
+S S S T LF
+T S S S S S S S LF
+T T S LF
+T LF
+LF
+S S S T T S T T T S S T T S S T S T S T T T S T T T S T T S T T S S S T T S T S S T S T T S T T T S S T T S S T S T LF
+S S S T S T S LF
+S S S T T S T LF
+T LF
+S S T LF
+S S LF
+T LF
+LF
+
