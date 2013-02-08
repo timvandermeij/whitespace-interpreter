@@ -175,7 +175,7 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     for(int k = binNum.size() - 1; k >= 0; k++) {
     	sum += binNum[k] == TAB ? pow(2, k) : 0;
     }
-    return sign * sum; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
+    return sign * sum;
 }
 
 void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
@@ -285,7 +285,7 @@ void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
         } else {
             throw unreachableToken;
         }
-    } else if(tokens[k++] == LINEFEED && tokens[k] == LINEFEED) { // ENDPROG
+    } else if(tokens[k] == LINEFEED && tokens[++k] == LINEFEED) { // ENDPROG
         p.push_back(ENDPROG);
     } else {
         throw unreachableToken;
@@ -347,11 +347,10 @@ Program tokensToProgram(const vector<Token> &tokens) {
         } else {
             throw unreachableToken;
         }
+        k++; // Proceed to next instruction
         m = determineMode(tokens[k], tokens[k + 1]);
-        if(m == STACKMANIP || m == FLOWCONT) {
+        if(!(m == STACKMANIP || m == FLOWCONT)) {
             k++;
-        } else {
-            k += 2;
         }
     }
     return p;
