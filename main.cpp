@@ -286,7 +286,7 @@ void processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
         } else {
             throw unreachableToken;
         }
-    } else if(tokens[k++] == LINEFEED && tokens[k] == LINEFEED) { // ENDPROG
+    } else if(tokens[k] == LINEFEED && tokens[++k] == LINEFEED) { // ENDPROG
         p.push_back(ENDPROG);
     } else {
         throw unreachableToken;
@@ -348,11 +348,10 @@ Program tokensToProgram(const vector<Token> &tokens) {
         } else {
             throw unreachableToken;
         }
+        k++; // Proceed to next instruction
         m = determineMode(tokens[k], tokens[k + 1]);
-        if(m == STACKMANIP || m == FLOWCONT) {
+        if(!(m == STACKMANIP || m == FLOWCONT)) {
             k++;
-        } else {
-            k += 2;
         }
     }
     return p;
