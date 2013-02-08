@@ -155,11 +155,8 @@ const Mode determineMode(const Token t1, const Token t2) {
     }
 }
 
-const Instruction determineInstruction(const Mode m, const Token t1, const Token t2) {
-
-}
-
 // Side-effect: mutates the index from the for-loop in tokensToProgram
+// Labels are also represented as numbers, so labels will be handled as well.
 long tokensToNumber(const vector<Token> &tokens, int &index) {
     vector<Token> binNum;
     int amount = tokens.size();
@@ -208,11 +205,11 @@ void processStackManip(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[k] == SPACE) { // PUSH
         p.push_back(PUSH);
         parseNumber(tokens, p, k);
-    } else if(tokens[k] == TAB) { // COPY or SLIDE
+    } else if(tokens[k] == TAB) {
         k++;
         if(tokens[k] == SPACE) { // COPY
             p.push_back(COPY);
-        } else if(tokens[k] == LINEFEED) { // COPY
+        } else if(tokens[k] == LINEFEED) { // SLIDE
             p.push_back(SLIDE);
         } else {
             throw unreachableToken;
