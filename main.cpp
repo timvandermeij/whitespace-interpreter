@@ -103,18 +103,21 @@ void Interpreter::interpret() {
     for(pc = 0; pc < size; pc++) {
         switch(p[pc]) {
             // Stack manipulations
-            case PUSH:
+	    case PUSH: {
                 stack.push_front(p[++pc]);
                 break;
-            case DUP:
+	    }
+	    case DUP: {
                 stack.push_front(stack.front());
                 break;
-            case COPY:
+	    }
+	    case COPY: {
                 auto it = stack.begin();
                 advance(it, p[++pc]);
                 stack.push_front(*it);
                 break;
-            case SWAP:
+            }
+	    case SWAP: {
                 Instruction first, second;
                 first = stack.front();
                 stack.pop_front();
@@ -123,10 +126,12 @@ void Interpreter::interpret() {
                 stack.push_front(first);
                 stack.push_front(second);
                 break;
-            case DISCARD:
+            }
+	    case DISCARD: {
                 stack.pop_front();
                 break;
-            case SLIDE:
+            }
+	    case SLIDE: {
                 Instruction top;
                 top = stack.front();
                 ++pc;
@@ -135,46 +140,52 @@ void Interpreter::interpret() {
                 }
                 stack.push_front(top);
                 break;
+	    }
 
             // Arithmetic
-            case ADD:
+	    case ADD: {
                 int a = stack.front();
                 stack.pop_front();
                 int b = stack.front();
                 stack.pop_front();
                 stack.push_front(b + a);
                 break;
-            case SUB:
+            }
+	    case SUB: {
                 int a = stack.front();
                 stack.pop_front();
                 int b = stack.front();
                 stack.pop_front();
                 stack.push_front(b - a);
                 break;
-            case MUL:
+	    }
+	    case MUL: {
                 int a = stack.front();
                 stack.pop_front();
                 int b = stack.front();
                 stack.pop_front();
                 stack.push_front(b * a);
                 break;
-            case DIV:
+            }
+	    case DIV: {
                 int a = stack.front();
                 stack.pop_front();
                 int b = stack.front();
                 stack.pop_front();
                 stack.push_front(b / a);
                 break;
-            case MOD:
+	    }
+	    case MOD: {
                 int a = stack.front();
                 stack.pop_front();
                 int b = stack.front();
                 stack.pop_front();
                 stack.push_front(b % a);
                 break;
+            }
 
             // Heap access
-            case STORE:
+	    case STORE: {
                 int value = stack.front();
                 stack.pop_front();
                 int address = stack.front();
@@ -189,7 +200,8 @@ void Interpreter::interpret() {
                 }
                 heap.push_back(value);
                 break;
-            case RETRIEVE:
+            }
+	    case RETRIEVE: {
                 int size = heap.size();
                 int address = stack.front();
                 stack.pop_front();
@@ -199,13 +211,15 @@ void Interpreter::interpret() {
                     stack.push_front(heap[address]);
                 }
                 break;
+            }
 
             // Flow control
-            case MARK:
+	    case MARK: {
                 int label = p[++pc];
                 labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
                 break;
-            case CALL:
+            }
+	    case CALL: {
                 int label = p[++pc];
                 auto pair = labels.find(label);
                 if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
@@ -213,6 +227,7 @@ void Interpreter::interpret() {
                 }
                 pc = pair->second;
                 break;
+	    }
             default:
                 throw instructionNotFoundException;
         }
@@ -480,6 +495,8 @@ Program tokensToProgram(const vector<Token> &tokens) {
     int start = ((m == FLOWCONT || m == STACKMANIP) ? 1 : 2);
 
     for(int k = start; k < amount; k++) {
+        if(k == amount)
+	  cout << "k has reached max" << endl;
         if(m == STACKMANIP) {
             processStackManip(tokens, p, k);
         } else if(m == ARITH) {
@@ -494,10 +511,12 @@ Program tokensToProgram(const vector<Token> &tokens) {
             throw unreachableToken;
         }
         k++; // Proceed to next instruction
-        m = determineMode(tokens[k], tokens[k + 1]);
-        if(!(m == STACKMANIP || m == FLOWCONT)) {
+	if(k != amount) {
+	  m = determineMode(tokens[k], tokens[k + 1]);
+	  if(!(m == STACKMANIP || m == FLOWCONT)) {
             k++;
-        }
+	  }
+	}
     }
     return p;
 }
