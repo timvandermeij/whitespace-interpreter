@@ -102,131 +102,160 @@ void Interpreter::interpret() {
 
     for(pc = 0; pc < size; pc++) {
         switch(p[pc]) {
-            // Stack manipulations
+        // Stack manipulations
 	    case PUSH: {
-                stack.push_front(p[++pc]);
-                break;
+            stack.push_front(p[++pc]);
+            break;
 	    }
 	    case DUP: {
-                stack.push_front(stack.front());
-                break;
+            stack.push_front(stack.front());
+            break;
 	    }
 	    case COPY: {
-                auto it = stack.begin();
-                advance(it, p[++pc]);
-                stack.push_front(*it);
-                break;
-            }
+            auto it = stack.begin();
+            advance(it, p[++pc]);
+            stack.push_front(*it);
+            break;
+        }
 	    case SWAP: {
-                Instruction first, second;
-                first = stack.front();
-                stack.pop_front();
-                second = stack.front();
-                stack.pop_front();
-                stack.push_front(first);
-                stack.push_front(second);
-                break;
-            }
+            Instruction first, second;
+            first = stack.front();
+            stack.pop_front();
+            second = stack.front();
+            stack.pop_front();
+            stack.push_front(first);
+            stack.push_front(second);
+            break;
+        }
 	    case DISCARD: {
-                stack.pop_front();
-                break;
-            }
+            stack.pop_front();
+            break;
+        }
 	    case SLIDE: {
-                Instruction top;
-                top = stack.front();
-                ++pc;
-                for(int i = 0; i <= p[pc]; i++) {
-                    stack.pop_front();
-                }
-                stack.push_front(top);
-                break;
+            Instruction top;
+            top = stack.front();
+            ++pc;
+            for(int i = 0; i <= p[pc]; i++) {
+                stack.pop_front();
+            }
+            stack.push_front(top);
+            break;
 	    }
 
-            // Arithmetic
+        // Arithmetic
 	    case ADD: {
-                int a = stack.front();
-                stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b + a);
-                break;
-            }
+            int a = stack.front();
+            stack.pop_front();
+            int b = stack.front();
+            stack.pop_front();
+            stack.push_front(b + a);
+            break;
+        }
 	    case SUB: {
-                int a = stack.front();
-                stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b - a);
-                break;
+            int a = stack.front();
+            stack.pop_front();
+            int b = stack.front();
+            stack.pop_front();
+            stack.push_front(b - a);
+            break;
 	    }
 	    case MUL: {
-                int a = stack.front();
-                stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b * a);
-                break;
+            int a = stack.front();
+            stack.pop_front();
+            int b = stack.front();
+            stack.pop_front();
+            stack.push_front(b * a);
+            break;
             }
 	    case DIV: {
-                int a = stack.front();
-                stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b / a);
-                break;
+            int a = stack.front();
+            stack.pop_front();
+            int b = stack.front();
+            stack.pop_front();
+            stack.push_front(b / a);
+            break;
 	    }
 	    case MOD: {
-                int a = stack.front();
-                stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b % a);
-                break;
-            }
+            int a = stack.front();
+            stack.pop_front();
+            int b = stack.front();
+            stack.pop_front();
+            stack.push_front(b % a);
+            break;
+        }
 
-            // Heap access
+        // Heap access
 	    case STORE: {
-                int value = stack.front();
-                stack.pop_front();
-                int address = stack.front();
-                if(address < 0) {
-                    throw outOfBoundsException;
-                }
-                int size = heap.size();
-                if(size < address) {
-                    for(int i = size; i < address; i++) {
-                        heap.push_back(0);
-                    }
-                }
-                heap.push_back(value);
-                break;
+            int value = stack.front();
+            stack.pop_front();
+            int address = stack.front();
+            if(address < 0) {
+                throw outOfBoundsException;
             }
+            int size = heap.size();
+            if(size < address) {
+                for(int i = size; i < address; i++) {
+                    heap.push_back(0);
+                }
+            }
+            heap.push_back(value);
+            break;
+        }
 	    case RETRIEVE: {
-                int size = heap.size();
-                int address = stack.front();
-                stack.pop_front();
-                if((size < address) || (address < 0)) {
-                    throw outOfBoundsException;
-                } else {
-                    stack.push_front(heap[address]);
-                }
-                break;
+            int size = heap.size();
+            int address = stack.front();
+            stack.pop_front();
+            if((size < address) || (address < 0)) {
+                throw outOfBoundsException;
+            } else {
+                stack.push_front(heap[address]);
             }
+            break;
+        }
 
-            // Flow control
+        // Flow control
 	    case MARK: {
-                int label = p[++pc];
-                labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
-                break;
-            }
+            int label = p[++pc];
+            labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
+            break;
+        }
 	    case CALL: {
-                int label = p[++pc];
-                auto pair = labels.find(label);
-                if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
-                    throw labelNotFoundException;
-                }
-                pc = pair->second;
-                break;
+            int label = p[++pc];
+            auto pair = labels.find(label);
+            if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
+                throw labelNotFoundException;
+            }
+            pc = pair->second;
+            break;
+	    }
+	    case JUMP: {
+	    	break;
+	    }
+	    case JUMPZERO: {
+	    	break;
+	    }
+	    case JUMPNEG: {
+	    	break;
+	    }
+	    case ENDSUB: {
+	    	break;
+	    }
+	    case ENDPROG: {
+	    	break;
+	    }
+	    
+	    // I/O operations
+	    case WRITEC: {
+	    	break;
+	    }
+	    case WRITEN: {
+	    	break;
+	    }
+	    case READC: {
+	    	break;
+	    }
+	    case READN: {
+	    	break;
 	    }
             default:
                 throw instructionNotFoundException;
@@ -334,7 +363,7 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     }
     binNum.erase(binNum.begin()); // Pop the sign bit
     for(int k = binNum.size() - 1; k >= 0; k++) {
-    	sum += binNum[k] == TAB ? pow(2, k) : 0;
+    	sum += ((binNum[k] == TAB) ? pow(2, k) : 0);
     }
     return sign * sum;
 }
@@ -556,9 +585,11 @@ string programToString(Program p) {
       default: throw instructionNotFoundException;
     }
     switch(p[k]) {
-      case PUSH: case COPY: case SLIDE: case MARK:
-      case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
-	s.append(to_string(p[++k]));
+		case PUSH: case COPY: case SLIDE: case MARK:
+		case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
+			s.append(to_string(p[++k])); break;
+		default: break;
+		
     }
     s.append("\n");
   }
