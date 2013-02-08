@@ -179,20 +179,6 @@ long tokensToNumber(const vector<Token> &tokens, int &index) {
     return 1; // This should be the binary number itself. Keep in mind that the first item in the vector is the sign bit.
 }
 
-// Side-effect: mutates the index from the for-loop in tokensToProgram
-vector<Token> tokensToLabel(const vector<Token> &tokens, int &index) {
-    vector<Token> label;
-    int amount = tokens.size();
-
-    while(tokens[index] != LINEFEED) { // A label is terminated by a LINEFEED
-        label.push_back(tokens[index++]);
-        if(index == amount) {
-            throw prematureEndException;
-        }
-    }
-    return label;
-}
-
 void parseNumber(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[++k] == LINEFEED) { // No label as argument
         throw noLabelArg;
@@ -361,6 +347,12 @@ Program tokensToProgram(const vector<Token> &tokens) {
             processIO(tokens, p, k);
         } else {
             throw unreachableToken;
+        }
+        m = determineMode(tokens[k], tokens[k + 1]);
+        if(m == STACKMANIP || m == FLOWCONT) {
+            k++;
+        } else {
+            k += 2;
         }
     }
     return p;
