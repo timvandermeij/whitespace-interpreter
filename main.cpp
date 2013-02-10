@@ -228,13 +228,35 @@ void Interpreter::interpret() {
             pc = pair->second;
             break;
 	    }
-	    case JUMP: {
+	    case JUMP: { //No difference with CALL?
+	    	int label = p[++pc];
+            auto pair = labels.find(label);
+            if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
+                throw labelNotFoundException;
+            }
+            pc = pair->second;
 	    	break;
 	    }
 	    case JUMPZERO: {
+	    	int label = p[++pc];
+            auto pair = labels.find(label);
+            if(stack.front() == 0) {
+		        if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
+		            throw labelNotFoundException;
+		        }
+		        pc = pair->second;
+	        }
 	    	break;
 	    }
 	    case JUMPNEG: {
+	    	int label = p[++pc];
+            auto pair = labels.find(label);
+            if(stack.front() < 0) {
+		        if(pair == labels.end()) { // Is this correct? Fetches last item probably, which is not what we want
+		            throw labelNotFoundException;
+		        }
+		        pc = pair->second;
+	        }
 	    	break;
 	    }
 	    case ENDSUB: {
