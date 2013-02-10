@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "Parser.h"
+#include "Exceptions.h"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ string programToString(Program p) {
             case WRITEN: s.append("WRITEN"); break;
             case READC: s.append("READC"); break;
             case READN: s.append("READN"); break;
-            default: try {throw instructionNotFoundException;} catch (exception& e) {cout << e.what() << endl;}
+            default: throw(instructionNotFoundException);
         }
         switch(p[k]) {
 		    case PUSH: case COPY: case SLIDE: case MARK:

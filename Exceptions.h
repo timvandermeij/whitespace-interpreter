@@ -3,55 +3,71 @@
 
 #include <exception>
 
-class unreachableTokenException: public std::exception {
+class UnreachableTokenException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: unreachable token.";
     }
 };
 
-class noArgumentException: public std::exception {
+extern const UnreachableTokenException unreachableTokenException;
+
+class NoArgumentException: public std::exception {
 };
 
-class noNumericArgumentException: public noArgumentException {
+class NoNumericArgumentException: public NoArgumentException {
     virtual const char *what() const throw () {
         return "Error: no numeric argument was passed.";
     }
 };
 
-class noLabelArgumentException: public noArgumentException {
+extern const NoNumericArgumentException noNumericArgumentException;
+
+class NoLabelArgumentException: public NoArgumentException {
     virtual const char *what() const throw () {
         return "Error: no label argument was passed.";
     }
 };
 
-class outOfBoundsException: public noArgumentException {
+extern const NoLabelArgumentException noLabelArgumentException;
+
+class OutOfBoundsException: public NoArgumentException {
     virtual const char *what() const throw () {
         return "Error: index out of bounds.";
     }
 };
 
-class prematureEndException: public std::exception {
+extern const OutOfBoundsException outOfBoundsException;
+
+class PrematureEndException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: number or label ended prematurely.";
     }
 };
 
-class undefinedSignException: public std::exception {
+extern const PrematureEndException prematureEndException;
+
+class UndefinedSignException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: sign of the number is undefined.";
     }
 };
 
-class instructionNotFoundException: public std::exception {
+extern const UndefinedSignException undefinedSignException;
+
+class InstructionNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: instruction has not been found.";
     }
 };
 
-class labelNotFoundException: public std::exception {
+extern const InstructionNotFoundException instructionNotFoundException;
+
+class LabelNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: label has not been found.";
     }
 };
+
+extern const LabelNotFoundException labelNotFoundException;
 
 #endif

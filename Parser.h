@@ -6,7 +6,6 @@
 #include <iostream>
 #include <cmath>
 
-#include "Types.h"
 #include "Interpreter.h"
 
 class Parser {
