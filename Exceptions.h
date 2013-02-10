@@ -7,7 +7,8 @@ class UnreachableTokenException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: unreachable token.";
     }
-} unreachableTokenException;
+};
+extern const UnreachableTokenException unreachableTokenException;
 
 class NoArgumentException: public std::exception {
 };
@@ -16,42 +17,56 @@ class NoNumericArgumentException: public NoArgumentException {
     virtual const char *what() const throw () {
         return "Error: no numeric argument was passed.";
     }
-} noNumericArgumentException;
+};
+
+extern const NoNumericArgumentException noNumericArgumentException;
 
 class NoLabelArgumentException: public NoArgumentException {
     virtual const char *what() const throw () {
         return "Error: no label argument was passed.";
     }
-} noLabelArgumentException;
+};
+
+extern const NoLabelArgumentException noLabelArgumentException;
 
 class OutOfBoundsException: public NoArgumentException {
     virtual const char *what() const throw () {
         return "Error: index out of bounds.";
     }
-} outOfBoundsException;
+};
+
+extern const OutOfBoundsException outOfBoundsException;
 
 class PrematureEndException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: number or label ended prematurely.";
     }
-} prematureEndException;
+};
+
+extern const PrematureEndException prematureEndException;
 
 class UndefinedSignException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: sign of the number is undefined.";
     }
-} undefinedSignException;
+};
+
+extern const UndefinedSignException undefinedSignException;
 
 class InstructionNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: instruction has not been found.";
     }
-} instructionNotFoundException;
+};
+
+extern const InstructionNotFoundException instructionNotFoundException;
 
 class LabelNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: label has not been found.";
     }
-} labelNotFoundException;
+};
+
+extern const LabelNotFoundException labelNotFoundException;
 
 #endif
