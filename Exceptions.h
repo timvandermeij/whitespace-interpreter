@@ -3,55 +3,55 @@
 
 #include <exception>
 
-class UnreachableTokenException: public std::exception {
+class unreachableTokenException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: unreachable token.";
     }
-} unreachableTokenException;
-
-class NoArgumentException: public std::exception {
 };
 
-class NoNumericArgumentException: public NoArgumentException {
+class noArgumentException: public std::exception {
+};
+
+class noNumericArgumentException: public noArgumentException {
     virtual const char *what() const throw () {
         return "Error: no numeric argument was passed.";
     }
-} noNumericArgumentException;
+};
 
-class NoLabelArgumentException: public NoArgumentException {
+class noLabelArgumentException: public noArgumentException {
     virtual const char *what() const throw () {
         return "Error: no label argument was passed.";
     }
-} noLabelArgumentException;
+};
 
-class OutOfBoundsException: public NoArgumentException {
+class outOfBoundsException: public noArgumentException {
     virtual const char *what() const throw () {
         return "Error: index out of bounds.";
     }
-} outOfBoundsException;
+};
 
-class PrematureEndException: public std::exception {
+class prematureEndException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: number or label ended prematurely.";
     }
-} prematureEndException;
+};
 
-class UndefinedSignException: public std::exception {
+class undefinedSignException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: sign of the number is undefined.";
     }
-} undefinedSignException;
+};
 
-class InstructionNotFoundException: public std::exception {
+class instructionNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: instruction has not been found.";
     }
-} instructionNotFoundException;
+};
 
-class LabelNotFoundException: public std::exception {
+class labelNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: label has not been found.";
     }
-} labelNotFoundException;
+};
 
 #endif
