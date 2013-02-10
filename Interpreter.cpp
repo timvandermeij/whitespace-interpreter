@@ -7,7 +7,7 @@ Interpreter::Interpreter(Program p) {
 }
 
 void Interpreter::interpret() {
-    unsigned pc, oldPc, size = p.size();
+    unsigned pc, size = p.size();
 
     for(pc = 0; pc < size; pc++) {
         switch(p[pc]) {
@@ -134,7 +134,7 @@ void Interpreter::interpret() {
                 if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
                     throw labelNotFoundException;
                 }
-                oldPc = pc;
+                callStack.push_back(pc);
                 pc = pair->second;
                 break;
             }
@@ -144,7 +144,7 @@ void Interpreter::interpret() {
                 if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
                     throw labelNotFoundException;
                 }
-                oldPc = pc;
+                callStack.push_back(pc);
                 pc = pair->second;
                 break;
             }
@@ -155,7 +155,7 @@ void Interpreter::interpret() {
                     if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
                         throw labelNotFoundException;
                     }
-                    oldPc = pc;
+                    callStack.push_back(pc);
                     pc = pair->second;
                 }
                 break;
@@ -167,24 +167,31 @@ void Interpreter::interpret() {
                     if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
                         throw labelNotFoundException;
                     }
-                    oldPc = pc;
+                    callStack.push_back(pc);
                     pc = pair->second;
                 }
                 break;
             }
             case ENDSUB: {
-                pc = oldPc;
-                oldPc = 0;
+                pc = callStack.back();
+                callStack.pop_back();
                 break;
             }
             case ENDPROG: {
+                cout << endl << endl << "Press the Enter key to exit..." << endl;
+                cin.get();
+                cin.ignore();
                 exit(0);
             }
 
             // I/O operations
-            case WRITEC:
+            case WRITEC: {
+                cout << (char)stack.front() << endl;
+                stack.pop_front();
+                break;
+            }
             case WRITEN: {
-                cout << stack.front() << endl;
+                cout << (int)stack.front() << endl;
                 stack.pop_front();
                 break;
             }
