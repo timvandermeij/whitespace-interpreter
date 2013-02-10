@@ -135,7 +135,7 @@ void Interpreter::interpret() {
                     throw labelNotFoundException;
                 }
                 callStack.push_back(pc);
-                pc = pair->second;
+                pc = pair->second; // go to the instruction at the found program counter
                 break;
             }
             case JUMP: {
@@ -144,7 +144,8 @@ void Interpreter::interpret() {
                 if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
                     throw labelNotFoundException;
                 }
-                callStack.push_back(pc);
+                /// callStack.push_back(pc); <- isn't necessary, because
+		// jumps are used for loops, not for subroutines
                 pc = pair->second;
                 break;
             }
@@ -155,7 +156,7 @@ void Interpreter::interpret() {
                     if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
                         throw labelNotFoundException;
                     }
-                    callStack.push_back(pc);
+                    // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
                 }
                 break;
@@ -167,7 +168,7 @@ void Interpreter::interpret() {
                     if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
                         throw labelNotFoundException;
                     }
-                    callStack.push_back(pc);
+                    // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
                 }
                 break;
@@ -178,10 +179,11 @@ void Interpreter::interpret() {
                 break;
             }
             case ENDPROG: {
-                cout << endl << endl << "Press the Enter key to exit..." << endl;
-                cin.get();
-                cin.ignore();
-                exit(0);
+                // cout << endl << endl << "Press the Enter key to exit..." << endl;
+                // cin.get();
+                // cin.ignore();
+                // exit(0);
+	        return; // this is officially the end of the interpreter session
             }
 
             // I/O operations
@@ -191,7 +193,7 @@ void Interpreter::interpret() {
                 break;
             }
             case WRITEN: {
-                cout << (int)stack.front() << endl;
+                cout << stack.front() << endl;
                 stack.pop_front();
                 break;
             }
