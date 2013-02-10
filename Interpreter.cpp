@@ -173,9 +173,8 @@ void Interpreter::interpret() {
                 break;
             }
             case ENDSUB: {
-                unsigned oldPc = callStack.back();
+                pc = callStack.back();
                 callStack.pop_back();
-                pc = oldPc;
                 break;
             }
             case ENDPROG: {
