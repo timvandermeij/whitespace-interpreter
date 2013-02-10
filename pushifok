@@ -1,6 +1,6 @@
-FLAGS='-std=c++11 -fpermissive'
-g++ -Wall -Wextra main.cpp -o whitespace $FLAGS
+make
+
 if [[ $? -eq 0 ]]; then
-   echo 'the program was compiled successfully, going to push...'
+   echo 'The program was compiled successfully, going to push...'
    git push origin master
 fi
