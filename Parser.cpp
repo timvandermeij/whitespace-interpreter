@@ -4,7 +4,7 @@ using namespace std;
 
 // Note: could be implemented using some sort of lookup table
 // data structure indexed by a pair of enums.
-const Mode determineMode(const Token t1, const Token t2) {
+Mode Parser::determineMode(const Token t1, const Token t2) {
     switch(t1) {
         case LINEFEED:
             return FLOWCONT;

@@ -27,7 +27,7 @@ void Interpreter::interpret() {
                 break;
             }
             case SWAP: {
-                Instruction first, second;
+                int first, second;
                 first = stack.front();
                 stack.pop_front();
                 second = stack.front();
@@ -41,7 +41,7 @@ void Interpreter::interpret() {
                 break;
             }
             case SLIDE: {
-                Instruction top;
+                int top;
                 top = stack.front();
                 ++pc;
                 for(int i = 0; i <= p[pc]; i++) {

@@ -2,8 +2,6 @@
 #include <fstream>
 
 #include "Parser.h"
-#include "Interpreter.h"
-#include "Exceptions.h"
 
 using namespace std;
 
