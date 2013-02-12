@@ -57,7 +57,7 @@ string programToString(Program p) {
             case WRITEN: s.append("WRITEN"); break;
             case READC: s.append("READC"); break;
             case READN: s.append("READN"); break;
-            default: throw(instructionNotFoundException);
+            default: throw InstructionNotFoundException();
         }
         switch(p[k]) {
 		    case PUSH: case COPY: case SLIDE: case MARK:
