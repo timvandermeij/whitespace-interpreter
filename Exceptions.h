@@ -54,4 +54,9 @@ class LabelNotFoundException: public std::exception {
     }
 };
 
+class SomeException: public std::exception {
+    virtual const char *what() const throw () {
+        return "Error: some unspecified exception has occurred. :(";
+    }
+};
 #endif
