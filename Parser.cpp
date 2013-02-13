@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "Exceptions.h"
 
 using namespace std;
 

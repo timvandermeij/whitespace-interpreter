@@ -8,6 +8,7 @@ class UnreachableTokenException: public std::exception {
         return "Error: unreachable token.";
     }
 };
+
 extern const UnreachableTokenException unreachableTokenException;
 
 class NoArgumentException: public std::exception {

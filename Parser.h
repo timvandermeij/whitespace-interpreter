@@ -8,6 +8,7 @@
 
 #include "Types.h"
 #include "Interpreter.h"
+#include "Exceptions.h"
 
 class Parser {
     public:
