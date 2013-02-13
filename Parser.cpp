@@ -20,10 +20,10 @@ Mode Parser::determineMode(const Token t1, const Token t2) {
                 case TAB:
                     return HEAPACC;
                 default:
-                    throw unreachableTokenException;
+                    throw UnreachableTokenException();
             }
         default:
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
     }
 }
 
@@ -79,7 +79,7 @@ Program Parser::tokensToProgram(const vector<Token> &tokens) {
         } else if(m == IO) {
             processIO(tokens, p, k);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
         k++; // Proceed to next instruction
         if(k != amount) {
@@ -103,7 +103,7 @@ long Parser::tokensToNumber(const vector<Token> &tokens, int &index) {
     while(tokens[index] != LINEFEED) { // A number is terminated by a LINEFEED
         binNum.push_back(tokens[index++]);
         if(index == amount) {
-            throw prematureEndException;
+            throw PrematureEndException();
         }
     }
 
@@ -112,10 +112,11 @@ long Parser::tokensToNumber(const vector<Token> &tokens, int &index) {
     } else if(binNum.front() == TAB) {
         sign = -1;
     } else {
-        throw undefinedSignException;
+        throw UndefinedSignException();
     }
     binNum.erase(binNum.begin()); // Pop the sign bit
-    for(int k = binNum.size() - 1; k >= 0; k++) {
+    for(int k = binNum.size() - 1; k >= 0; k--) {
+    	cout << "Sum = " << sum << endl;
         sum += ((binNum[k] == TAB) ? pow(2, k) : 0);
     }
     return sign * sum;
@@ -123,7 +124,7 @@ long Parser::tokensToNumber(const vector<Token> &tokens, int &index) {
 
 void Parser::parseNumber(const vector<Token> &tokens, Program &p, int &k) {
     if(tokens[++k] == LINEFEED) { // No label as argument
-        throw noLabelArgumentException;
+        throw NoLabelArgumentException();
     } else { // We're going to parse the label now
         p.push_back(tokensToNumber(tokens, k));
     }
@@ -140,7 +141,7 @@ void Parser::processStackManip(const vector<Token> &tokens, Program &p, int &k) 
         } else if(tokens[k] == LINEFEED) { // SLIDE
             p.push_back(SLIDE);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
         // COPY and SLIDE both require a numeric argument,
         // so we shall try to parse a number now
@@ -157,10 +158,10 @@ void Parser::processStackManip(const vector<Token> &tokens, Program &p, int &k) 
         } else if(tokens[k] == LINEFEED) { // DISCARD
             p.push_back(DISCARD);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
     } else {
-        throw unreachableTokenException;
+        throw UnreachableTokenException();
     }
 }
 
@@ -174,7 +175,7 @@ void Parser::processArith(const vector<Token> &tokens, Program &p, int &k) {
         } else if(tokens[k] == LINEFEED) { // MUL
             p.push_back(MUL);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
     } else if(tokens[k] == TAB) {
         k++;
@@ -183,10 +184,10 @@ void Parser::processArith(const vector<Token> &tokens, Program &p, int &k) {
         } else if(tokens[k] == TAB) { // MOD
             p.push_back(MOD);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
     } else {
-        throw unreachableTokenException;
+        throw UnreachableTokenException();
     }
 }
 
@@ -196,7 +197,7 @@ void Parser::processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
     } else if(tokens[k] == TAB) { // RETRIEVE
         p.push_back(RETRIEVE);
     } else {
-        throw unreachableTokenException;
+        throw UnreachableTokenException();
     }
 }
 
@@ -213,7 +214,7 @@ void Parser::processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
             p.push_back(JUMP);
             parseNumber(tokens, p, k);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
     } else if(tokens[k] == TAB) {
         k++;
@@ -226,12 +227,12 @@ void Parser::processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
         } else if(tokens[k] == LINEFEED) { // ENDSUB
             p.push_back(ENDSUB);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
     } else if(tokens[k] == LINEFEED && tokens[++k] == LINEFEED) { // ENDPROG
         p.push_back(ENDPROG);
     } else {
-        throw unreachableTokenException;
+        throw UnreachableTokenException();
     }
 }
 
@@ -243,7 +244,7 @@ void Parser::processIO(const vector<Token> &tokens, Program &p, int &k) {
         } else if(tokens[k] == TAB) { // WRITEN
             p.push_back(WRITEN);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
     } else if(tokens[k] == TAB) {
         k++;
@@ -252,9 +253,9 @@ void Parser::processIO(const vector<Token> &tokens, Program &p, int &k) {
         } else if(tokens[k] == TAB) { // READN
             p.push_back(READN);
         } else {
-            throw unreachableTokenException;
+            throw UnreachableTokenException();
         }
     } else {
-        throw unreachableTokenException;
+        throw UnreachableTokenException();
     }
 }

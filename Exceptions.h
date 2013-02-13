@@ -9,8 +9,6 @@ class UnreachableTokenException: public std::exception {
     }
 };
 
-extern const UnreachableTokenException unreachableTokenException;
-
 class NoArgumentException: public std::exception {
 };
 
@@ -20,15 +18,11 @@ class NoNumericArgumentException: public NoArgumentException {
     }
 };
 
-extern const NoNumericArgumentException noNumericArgumentException;
-
 class NoLabelArgumentException: public NoArgumentException {
     virtual const char *what() const throw () {
         return "Error: no label argument was passed.";
     }
 };
-
-extern const NoLabelArgumentException noLabelArgumentException;
 
 class OutOfBoundsException: public NoArgumentException {
     virtual const char *what() const throw () {
@@ -36,15 +30,11 @@ class OutOfBoundsException: public NoArgumentException {
     }
 };
 
-extern const OutOfBoundsException outOfBoundsException;
-
 class PrematureEndException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: number or label ended prematurely.";
     }
 };
-
-extern const PrematureEndException prematureEndException;
 
 class UndefinedSignException: public std::exception {
     virtual const char *what() const throw () {
@@ -52,22 +42,16 @@ class UndefinedSignException: public std::exception {
     }
 };
 
-extern const UndefinedSignException undefinedSignException;
-
 class InstructionNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: instruction has not been found.";
     }
 };
 
-extern const InstructionNotFoundException instructionNotFoundException;
-
 class LabelNotFoundException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: label has not been found.";
     }
 };
-
-extern const LabelNotFoundException labelNotFoundException;
 
 #endif

@@ -100,7 +100,7 @@ void Interpreter::interpret() {
                 stack.pop_front();
                 int address = stack.front();
                 if(address < 0) {
-                    throw outOfBoundsException;
+                    throw OutOfBoundsException();
                 }
                 int size = heap.size();
                 if(size < address) {
@@ -116,7 +116,7 @@ void Interpreter::interpret() {
                 int address = stack.front();
                 stack.pop_front();
                 if((size < address) || (address < 0)) {
-                    throw outOfBoundsException;
+                    throw OutOfBoundsException();
                 } else {
                     stack.push_front(heap[address]);
                 }
@@ -133,7 +133,7 @@ void Interpreter::interpret() {
                 int label = p[++pc];
                 auto pair = labels.find(label);
                 if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
-                    throw labelNotFoundException;
+                    throw LabelNotFoundException();
                 }
                 callStack.push_back(pc);
                 pc = pair->second; // go to the instruction at the found program counter
@@ -143,7 +143,7 @@ void Interpreter::interpret() {
                 int label = p[++pc];
                 auto pair = labels.find(label);
                 if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
-                    throw labelNotFoundException;
+                    throw LabelNotFoundException();
                 }
                 /// callStack.push_back(pc); <- isn't necessary, because
 		// jumps are used for loops, not for subroutines
@@ -155,7 +155,7 @@ void Interpreter::interpret() {
                     int label = p[++pc];
                     auto pair = labels.find(label);
                     if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
-                        throw labelNotFoundException;
+                        throw LabelNotFoundException();
                     }
                     // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
@@ -167,7 +167,7 @@ void Interpreter::interpret() {
                     int label = p[++pc];
                     auto pair = labels.find(label);
                     if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
-                        throw labelNotFoundException;
+                        throw LabelNotFoundException();
                     }
                     // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
@@ -211,7 +211,7 @@ void Interpreter::interpret() {
                 break;
             }
             default:
-                throw instructionNotFoundException;
+                throw InstructionNotFoundException();
         }
     }
 }
