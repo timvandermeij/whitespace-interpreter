@@ -158,7 +158,7 @@ const string readFile(const string filename) {
 int main() {
     // Load the Whitespace source file and tokenize it.
     Parser parser;
-    string fileContents = readFile("hello_world.ws");
+    string fileContents = readFile("hello_worldvanwiki.ws");
     auto tokens = parser.tokenize(fileContents);
     printTokens(tokens);
     cout << endl;

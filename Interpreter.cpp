@@ -180,10 +180,9 @@ void Interpreter::interpret() {
                 break;
             }
             case ENDPROG: {
-                // cout << endl << endl << "Press the Enter key to exit..." << endl;
-                // cin.get();
-                // cin.ignore();
-                // exit(0);
+                cout << endl << endl << "Press the Enter key to exit..." << endl;
+                cin.ignore();
+                exit(0);
 	        return; // this is officially the end of the interpreter session
             }
 
