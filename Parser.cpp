@@ -116,7 +116,7 @@ long Parser::tokensToNumber(const vector<Token> &tokens, int &index) {
     }
     binNum.erase(binNum.begin()); // Pop the sign bit
     for(int k = binNum.size() - 1; k >= 0; k--) {
-    	//cout << "Sum = " << sum << endl;
+        //cout << "Sum = " << sum << endl;
         sum += ((binNum[k] == TAB) ? pow(2, k) : 0);
     }
     return sign * sum;

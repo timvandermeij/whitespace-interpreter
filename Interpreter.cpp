@@ -146,7 +146,7 @@ void Interpreter::interpret() {
                     throw LabelNotFoundException();
                 }
                 /// callStack.push_back(pc); <- isn't necessary, because
-		// jumps are used for loops, not for subroutines
+                // jumps are used for loops, not for subroutines
                 pc = pair->second;
                 break;
             }
@@ -183,7 +183,7 @@ void Interpreter::interpret() {
                 cout << endl << endl << "Press the Enter key to exit..." << endl;
                 cin.ignore();
                 exit(0);
-	        return; // this is officially the end of the interpreter session
+                return; // this is officially the end of the interpreter session
             }
 
             // I/O operations
