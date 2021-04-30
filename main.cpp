@@ -156,10 +156,18 @@ const string readFile(const string filename) {
     return fileContents;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    const char *filename = "hello_worldvanwiki.ws";
+    if (argc == 2) {
+        filename = argv[1];
+    } else if (argc > 2) {
+        cout << "usage: " << argv[0] << " [program]" << endl;
+        exit(1);
+    }
+
     // Load the Whitespace source file and tokenize it.
     Parser parser;
-    string fileContents = readFile("hello_worldvanwiki.ws");
+    string fileContents = readFile(filename);
     auto tokens = parser.tokenize(fileContents);
     printTokens(tokens);
     cout << endl;
