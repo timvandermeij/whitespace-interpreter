@@ -8,9 +8,9 @@
 using namespace std;
 
 void printTokens(const vector<Token> &tokens) {
-    int length = tokens.size();
+    size_t length = tokens.size();
 
-    for(int k = 0; k < length; k++) {
+    for(size_t k = 0; k < length; k++) {
         switch(tokens[k]) {
             case LINEFEED:
                 cout << "LF" << endl;
@@ -26,9 +26,9 @@ void printTokens(const vector<Token> &tokens) {
 }
 
 Program stringToProgram(string program) {
-    int size = program.size();
+    size_t size = program.size();
     Program p;
-    for(int k = 0; k < size; k++) {
+    for(size_t k = 0; k < size; k++) {
         while(program[k] == ' ' || program[k] == '\n') k++; // ignore whitespace
         if(k >= size) throw SomeException(); // program consisted only of spaces and newlines
         if(program[k] == 'P') {
@@ -44,7 +44,7 @@ Program stringToProgram(string program) {
                 }
                 long number = atoi(d.c_str());
                 p.push_back(PUSH);
-                p.push_back(number);
+                p.push_back((Instruction)number);
             } else throw SomeException();
         } else if(program[k] == 'A') {
             if(program.find("ADD", k) == k) {
@@ -66,7 +66,7 @@ Program stringToProgram(string program) {
                         if(k >= size) throw SomeException();
                     }
                     long number = atoi(d.c_str());
-                    p.push_back(number);
+                    p.push_back((Instruction)number);
                 } else throw SomeException();
             } else throw SomeException();
         } else if(program[k] == 'D') {
@@ -92,13 +92,14 @@ Program stringToProgram(string program) {
         while(k < size && program[k++] == ' ');
         if(k >= size || program[++k] != '\n') throw SomeException(); // there should be a newline here
     }
+    return p;
 }
 
 string programToString(Program p) {
-    int size = p.size();
+    size_t size = p.size();
     string s;
 
-    for(int k = 0; k < size; k++) {
+    for(size_t k = 0; k < size; k++) {
         switch(p[k]) {
             case PUSH: s.append("PUSH "); break;
             case DUP: s.append("DUP"); break;

@@ -16,13 +16,13 @@ class Parser {
 
     private:
         Mode determineMode(const Token, const Token);
-        long tokensToNumber(const std::vector<Token> &, int &);
-        void parseNumber(const std::vector<Token> &, Program &, int &);
-        void processStackManip(const std::vector<Token> &, Program &, int &);
-        void processArith(const std::vector<Token> &, Program &, int &);
-        void processHeapAcc(const std::vector<Token> &, Program &, int &);
-        void processFlowCont(const std::vector<Token> &, Program &, int &);
-        void processIO(const std::vector<Token> &, Program &, int &);
+        long tokensToNumber(const std::vector<Token> &, size_t &);
+        void parseNumber(const std::vector<Token> &, Program &, size_t &);
+        void processStackManip(const std::vector<Token> &, Program &, size_t &);
+        void processArith(const std::vector<Token> &, Program &, size_t &);
+        void processHeapAcc(const std::vector<Token> &, Program &, size_t &);
+        void processFlowCont(const std::vector<Token> &, Program &, size_t &);
+        void processIO(const std::vector<Token> &, Program &, size_t &);
 };
 
 #endif

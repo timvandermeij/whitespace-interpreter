@@ -8,13 +8,14 @@ Interpreter::Interpreter(Program p) {
 }
 
 void Interpreter::interpret() {
-    unsigned pc, size = p.size();
+    size_t pc, size = p.size();
 
     for(pc = 0; pc < size; pc++) {
         switch(p[pc]) {
             // Stack manipulations
             case PUSH: {
-                stack.push_front(p[++pc]);
+                int arg = p[++pc];
+                stack.push_front(arg);
                 break;
             }
             case DUP: {
@@ -22,8 +23,9 @@ void Interpreter::interpret() {
                 break;
             }
             case COPY: {
+                int arg = p[++pc];
                 auto it = stack.begin();
-                advance(it, p[++pc]);
+                advance(it, arg);
                 stack.push_front(*it);
                 break;
             }
@@ -42,10 +44,9 @@ void Interpreter::interpret() {
                 break;
             }
             case SLIDE: {
-                int top;
-                top = stack.front();
-                ++pc;
-                for(int i = 0; i <= p[pc]; i++) {
+                int arg = p[++pc];
+                int top = stack.front();
+                for(int i = 0; i <= arg; i++) {
                     stack.pop_front();
                 }
                 stack.push_front(top);
@@ -76,7 +77,7 @@ void Interpreter::interpret() {
                 stack.pop_front();
                 stack.push_front(b * a);
                 break;
-                }
+            }
             case DIV: {
                 int a = stack.front();
                 stack.pop_front();

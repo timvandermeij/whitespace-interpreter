@@ -4,10 +4,9 @@ An interpreter written in C++ for the esoteric programming language Whitespace.
 
 Instructions
 ============
-Compile with ``g++ -o whitespace main.cpp -std=c++11 -fpermissive``.
+Compile with ``make``.
 
-The `std=c++11` flag is required because of a single use of `auto` and
-we need the `-fpermissive` flag to convert a long to an enum.
+The `std=c++11` flag is required because of a single use of `auto`.
 
 Authors
 =======

@@ -1,6 +1,6 @@
 WARN = -Wall -Wextra
 DBG = -ggdb
-FLAGS = -std=c++11 -fpermissive
+FLAGS = -std=c++11
 
 all: main.o Parser.o Interpreter.o
 	g++ $(WARN) $(DBG) $(FLAGS) -o whitespace main.o Parser.o Interpreter.o
@@ -11,4 +11,4 @@ Interpreter.o: Interpreter.cpp Interpreter.h Types.h
 main.o: main.cpp Parser.h Interpreter.h Exceptions.h
 	g++ $(WARN) $(DBG) $(FLAGS) -c main.cpp
 clean:
-	rm *.o whitespace
+	rm -f *.o whitespace

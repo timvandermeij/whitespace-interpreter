@@ -47,7 +47,7 @@ vector<Token> Parser::tokenize(const string &program) {
 }
 
 Program Parser::tokensToProgram(const vector<Token> &tokens) {
-    int amount = tokens.size();
+    size_t amount = tokens.size();
     if(amount < 3) {
         exit(0); // Empty program
     }
@@ -61,9 +61,9 @@ Program Parser::tokensToProgram(const vector<Token> &tokens) {
     Program p;
 
     // FLOWCONT and STACKMANIP are only 1 token long, the rest is 2 tokens long
-    int start = ((m == FLOWCONT || m == STACKMANIP) ? 1 : 2);
+    size_t start = ((m == FLOWCONT || m == STACKMANIP) ? 1 : 2);
 
-    for(int k = start; k < amount; k++) {
+    for(size_t k = start; k < amount; k++) {
         if(k == amount) {
             cout << "k has reached max" << endl; // We might want to use an exception here...
         }
@@ -94,9 +94,9 @@ Program Parser::tokensToProgram(const vector<Token> &tokens) {
 
 // Side-effect: mutates the index from the for-loop in tokensToProgram
 // Labels are also represented as numbers, so labels will be handled as well.
-long Parser::tokensToNumber(const vector<Token> &tokens, int &index) {
+long Parser::tokensToNumber(const vector<Token> &tokens, size_t &index) {
     vector<Token> binNum;
-    int amount = tokens.size();
+    size_t amount = tokens.size();
     int sign;
     long sum = 0;
 
@@ -122,15 +122,15 @@ long Parser::tokensToNumber(const vector<Token> &tokens, int &index) {
     return sign * sum;
 }
 
-void Parser::parseNumber(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::parseNumber(const vector<Token> &tokens, Program &p, size_t &k) {
     if(tokens[++k] == LINEFEED) { // No label as argument
         throw NoLabelArgumentException();
     } else { // We're going to parse the label now
-        p.push_back(tokensToNumber(tokens, k));
+        p.push_back((Instruction)tokensToNumber(tokens, k));
     }
 }
 
-void Parser::processStackManip(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processStackManip(const vector<Token> &tokens, Program &p, size_t &k) {
     if(tokens[k] == SPACE) { // PUSH
         p.push_back(PUSH);
         parseNumber(tokens, p, k);
@@ -165,7 +165,7 @@ void Parser::processStackManip(const vector<Token> &tokens, Program &p, int &k) 
     }
 }
 
-void Parser::processArith(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processArith(const vector<Token> &tokens, Program &p, size_t &k) {
     if(tokens[k] == SPACE) {
         k++;
         if(tokens[k] == SPACE) { // ADD
@@ -191,7 +191,7 @@ void Parser::processArith(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void Parser::processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processHeapAcc(const vector<Token> &tokens, Program &p, size_t &k) {
     if(tokens[k] == SPACE) { // STORE
         p.push_back(STORE);
     } else if(tokens[k] == TAB) { // RETRIEVE
@@ -201,7 +201,7 @@ void Parser::processHeapAcc(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void Parser::processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processFlowCont(const vector<Token> &tokens, Program &p, size_t &k) {
     if(tokens[k] == SPACE) {
         k++;
         if(tokens[k] == SPACE) { // MARK
@@ -236,7 +236,7 @@ void Parser::processFlowCont(const vector<Token> &tokens, Program &p, int &k) {
     }
 }
 
-void Parser::processIO(const vector<Token> &tokens, Program &p, int &k) {
+void Parser::processIO(const vector<Token> &tokens, Program &p, size_t &k) {
     if(tokens[k] == SPACE) {
         k++;
         if(tokens[k] == SPACE) { // WRITEC
