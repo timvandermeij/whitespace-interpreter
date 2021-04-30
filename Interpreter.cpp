@@ -12,6 +12,21 @@ void Interpreter::interpret() {
 
     for(pc = 0; pc < size; pc++) {
         switch(p[pc]) {
+            case PUSH: case COPY: case SLIDE:
+            case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
+                pc++;
+                break;
+            case MARK: {
+                int label = p[++pc];
+                labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
+                break;
+            }
+            default: break;
+        }
+    }
+
+    for(pc = 0; pc < size; pc++) {
+        switch(p[pc]) {
             // Stack manipulations
             case PUSH: {
                 int arg = p[++pc];
@@ -126,24 +141,23 @@ void Interpreter::interpret() {
 
             // Flow control
             case MARK: {
-                int label = p[++pc];
-                labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
+                pc++;
                 break;
             }
-            case CALL: { // Not sure what the difference is between CALL and JUMP. I think this CALL function should actually execute a function...
+            case CALL: {
                 int label = p[++pc];
                 auto pair = labels.find(label);
-                if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                if(pair == labels.end()) {
                     throw LabelNotFoundException();
                 }
-                callStack.push_back(pc);
+                callStack.push_back(pc + 1);
                 pc = pair->second; // go to the instruction at the found program counter
                 break;
             }
             case JUMP: {
                 int label = p[++pc];
                 auto pair = labels.find(label);
-                if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                if(pair == labels.end()) {
                     throw LabelNotFoundException();
                 }
                 /// callStack.push_back(pc); <- isn't necessary, because
@@ -152,10 +166,10 @@ void Interpreter::interpret() {
                 break;
             }
             case JUMPZERO: {
+                int label = p[++pc];
                 if(stack.front() == 0) {
-                    int label = p[++pc];
                     auto pair = labels.find(label);
-                    if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                    if(pair == labels.end()) {
                         throw LabelNotFoundException();
                     }
                     // callStack.push_back(pc); <- same comment as above
@@ -164,10 +178,10 @@ void Interpreter::interpret() {
                 break;
             }
             case JUMPNEG: {
+                int label = p[++pc];
                 if(stack.front() < 0) {
-                    int label = p[++pc];
                     auto pair = labels.find(label);
-                    if(pair == labels.end()) { // Is this correct? Probably fetches last item, which is not what we want...
+                    if(pair == labels.end()) {
                         throw LabelNotFoundException();
                     }
                     // callStack.push_back(pc); <- same comment as above

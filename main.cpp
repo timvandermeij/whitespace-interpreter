@@ -101,12 +101,12 @@ string programToString(Program p) {
 
     for(size_t k = 0; k < size; k++) {
         switch(p[k]) {
-            case PUSH: s.append("PUSH "); break;
+            case PUSH: s.append("PUSH"); break;
             case DUP: s.append("DUP"); break;
-            case COPY: s.append("COPY "); break;
+            case COPY: s.append("COPY"); break;
             case SWAP: s.append("SWAP"); break;
             case DISCARD: s.append("DISCARD"); break;
-            case SLIDE: s.append("SLIDE "); break;
+            case SLIDE: s.append("SLIDE"); break;
             case ADD: s.append("ADD"); break;
             case SUB: s.append("SUB"); break;
             case MUL: s.append("MUL"); break;
@@ -133,6 +133,7 @@ string programToString(Program p) {
         switch(p[k]) {
             case PUSH: case COPY: case SLIDE: case MARK:
             case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
+                s.append(" ");
                 s.append(to_string(p[++k])); break;
             default: break;
         }

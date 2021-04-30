@@ -18,7 +18,7 @@ class Interpreter {
         std::vector<int> heap;
         std::list<int> stack; // To store values
         std::vector<int> callStack; // To remember where to return to
-        std::map<int, unsigned> labels; // Lookup table for labels
+        std::map<int, size_t> labels; // Lookup table for labels
 };
 
 #endif
