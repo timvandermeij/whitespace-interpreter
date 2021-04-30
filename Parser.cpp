@@ -94,30 +94,30 @@ Program Parser::tokensToProgram(const vector<Token> &tokens) {
 
 // Side-effect: mutates the index from the for-loop in tokensToProgram
 // Labels are also represented as numbers, so labels will be handled as well.
-long Parser::tokensToNumber(const vector<Token> &tokens, size_t &index) {
-    vector<Token> binNum;
+long Parser::tokensToNumber(const vector<Token> &tokens, size_t &k) {
     size_t amount = tokens.size();
     int sign;
     long sum = 0;
 
-    while(tokens[index] != LINEFEED) { // A number is terminated by a LINEFEED
-        binNum.push_back(tokens[index++]);
-        if(index == amount) {
-            throw PrematureEndException();
-        }
-    }
-
-    if(binNum.front() == SPACE) {
+    if(tokens[k] == SPACE) {
         sign = 1;
-    } else if(binNum.front() == TAB) {
+    } else if(tokens[k] == TAB) {
         sign = -1;
     } else {
         throw UndefinedSignException();
     }
-    binNum.erase(binNum.begin()); // Pop the sign bit
-    for(int k = binNum.size() - 1; k >= 0; k--) {
-        //cout << "Sum = " << sum << endl;
-        sum += ((binNum[k] == TAB) ? pow(2, k) : 0);
+    k++;
+    while(true) {
+        if(k == amount) {
+            throw PrematureEndException();
+        }
+        if(tokens[k] == LINEFEED) { // A number is terminated by a LINEFEED
+            break;
+        }
+        sum *= 2;
+        if (tokens[k++] == TAB) {
+            sum += 1;
+        }
     }
     return sign * sum;
 }

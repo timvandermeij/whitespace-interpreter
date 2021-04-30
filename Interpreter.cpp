@@ -189,12 +189,12 @@ void Interpreter::interpret() {
 
             // I/O operations
             case WRITEC: {
-                cout << (char)stack.front() << endl;
+                cout << (char)stack.front();
                 stack.pop_front();
                 break;
             }
             case WRITEN: {
-                cout << stack.front() << endl;
+                cout << stack.front();
                 stack.pop_front();
                 break;
             }
