@@ -15,10 +15,10 @@ class Interpreter {
 
     private:
         Program p; // Contains instructions from the Whitespace source
-        std::vector<int> heap;
-        std::list<int> stack; // To store values
-        std::vector<int> callStack; // To remember where to return to
-        std::map<int, size_t> labels; // Lookup table for labels
+        std::vector<long long> heap;
+        std::list<long long> stack; // To store values
+        std::vector<size_t> callStack; // To remember where to return to
+        std::map<long long, size_t> labels; // Lookup table for labels
 };
 
 #endif

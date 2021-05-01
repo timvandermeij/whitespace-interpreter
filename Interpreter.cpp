@@ -12,7 +12,7 @@ void Interpreter::interpret() {
 
     for(pc = 0; pc < size; pc++) {
         if(p[pc].type == MARK) {
-            labels.insert(pair<int, unsigned>(p[pc].arg, pc + 1)); // Go to next instruction after label
+            labels.insert(pair<long long, size_t>(p[pc].arg, pc + 1)); // Go to next instruction after label
         }
     }
 
@@ -35,7 +35,7 @@ void Interpreter::interpret() {
                 break;
             }
             case SWAP: {
-                int first, second;
+                long long first, second;
                 first = stack.front();
                 stack.pop_front();
                 second = stack.front();
@@ -49,8 +49,8 @@ void Interpreter::interpret() {
                 break;
             }
             case SLIDE: {
-                int top = stack.front();
-                for(int i = 0; i <= inst.arg; i++) {
+                long long top = stack.front();
+                for(long long i = 0; i <= inst.arg; i++) {
                     stack.pop_front();
                 }
                 stack.push_front(top);
@@ -59,31 +59,31 @@ void Interpreter::interpret() {
 
             // Arithmetic
             case ADD: {
-                int a = stack.front();
+                long long a = stack.front();
                 stack.pop_front();
                 stack.front() += a;
                 break;
             }
             case SUB: {
-                int a = stack.front();
+                long long a = stack.front();
                 stack.pop_front();
                 stack.front() -= a;
                 break;
             }
             case MUL: {
-                int a = stack.front();
+                long long a = stack.front();
                 stack.pop_front();
                 stack.front() *= a;
                 break;
             }
             case DIV: {
-                int a = stack.front();
+                long long a = stack.front();
                 stack.pop_front();
                 stack.front() /= a;
                 break;
             }
             case MOD: {
-                int a = stack.front();
+                long long a = stack.front();
                 stack.pop_front();
                 stack.front() %= a;
                 break;
@@ -91,7 +91,7 @@ void Interpreter::interpret() {
 
             // Heap access
             case STORE: {
-                int value = stack.front();
+                long long value = stack.front();
                 stack.pop_front();
                 size_t address = stack.front();
                 stack.pop_front();
@@ -105,9 +105,9 @@ void Interpreter::interpret() {
                 break;
             }
             case RETRIEVE: {
-                int address = stack.front();
+                size_t address = stack.front();
                 stack.pop_front();
-                int size = heap.size();
+                size_t size = heap.size();
                 if(address < 0) {
                     throw OutOfBoundsException();
                 } else if(size <= address) {
@@ -193,7 +193,7 @@ void Interpreter::interpret() {
                 break;
             }
             case READN: {
-                int number;
+                long long number;
                 cin >> number;
                 size_t address = stack.front();
                 stack.pop_front();
