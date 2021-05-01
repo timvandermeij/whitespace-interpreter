@@ -140,41 +140,56 @@ string programToString(Program p) {
     return s;
 }
 
-const string readFile(const string filename) {
+const string readFile(istream &input) {
     string line, fileContents;
-    ifstream input;
-
-    input.open(filename.c_str());
-    if (input.is_open()) {
-        while (!input.eof()) {
-            getline(input, line);
-            fileContents.append(line);
-            fileContents.append("\n");
-        }
+    while (!input.eof()) {
+        getline(input, line);
+        fileContents.append(line);
+        fileContents.append("\n");
     }
     return fileContents;
 }
 
 int main(int argc, char *argv[]) {
-    const char *filename = "hello_worldvanwiki.ws";
-    if (argc == 2) {
-        filename = argv[1];
-    } else if (argc > 2) {
-        cout << "usage: " << argv[0] << " [program]" << endl;
-        exit(1);
+    bool verbose = false;
+    string filename;
+    if(argc > 1) {
+        verbose = string(argv[1]) == "-v" || string(argv[1]) == "--verbose";
+        if(!verbose && argc == 2) {
+            filename = argv[1];
+        } else if(verbose && argc == 3) {
+            filename = argv[2];
+        } else if(argc > 2) {
+            cout << "usage: " << argv[0] << " [-v/--verbose] [program]" << endl;
+            exit(2);
+        }
     }
 
     // Load the Whitespace source file and tokenize it.
     Parser parser;
-    string fileContents = readFile(filename);
+    string fileContents;
+    if(filename == "") {
+        fileContents = readFile(cin);
+    } else {
+        ifstream input(filename);
+        if(!input.is_open()) {
+            cout << "File does not exist: " << filename << endl;
+            exit(1);
+        }
+        fileContents = readFile(input);
+    }
     auto tokens = parser.tokenize(fileContents);
-    printTokens(tokens);
-    cout << endl;
+    if(verbose) {
+        printTokens(tokens);
+        cout << endl;
+    }
 
     // Print the tokens in an assembly-like way.
     auto program = parser.tokensToProgram(tokens);
-    string textrep = programToString(program);
-    cout << textrep << endl;
+    if(verbose) {
+        string textrep = programToString(program);
+        cout << textrep << endl;
+    }
 
     // Interpret the Whitespace source file.
     Interpreter interpreter(program);
