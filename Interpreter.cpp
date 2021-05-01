@@ -25,11 +25,11 @@ void Interpreter::interpret() {
         }
     }
 
-    for(pc = 0; pc < size; pc++) {
-        switch(p[pc]) {
+    for(pc = 0; pc < size; ) {
+        switch(p[pc++]) {
             // Stack manipulations
             case PUSH: {
-                int arg = p[++pc];
+                int arg = p[pc++];
                 stack.push_front(arg);
                 break;
             }
@@ -38,7 +38,7 @@ void Interpreter::interpret() {
                 break;
             }
             case COPY: {
-                int arg = p[++pc];
+                int arg = p[pc++];
                 auto it = stack.begin();
                 advance(it, arg);
                 stack.push_front(*it);
@@ -59,7 +59,7 @@ void Interpreter::interpret() {
                 break;
             }
             case SLIDE: {
-                int arg = p[++pc];
+                int arg = p[pc++];
                 int top = stack.front();
                 for(int i = 0; i <= arg; i++) {
                     stack.pop_front();
@@ -72,41 +72,31 @@ void Interpreter::interpret() {
             case ADD: {
                 int a = stack.front();
                 stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b + a);
+                stack.front() += a;
                 break;
             }
             case SUB: {
                 int a = stack.front();
                 stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b - a);
+                stack.front() -= a;
                 break;
             }
             case MUL: {
                 int a = stack.front();
                 stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b * a);
+                stack.front() *= a;
                 break;
             }
             case DIV: {
                 int a = stack.front();
                 stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b / a);
+                stack.front() /= a;
                 break;
             }
             case MOD: {
                 int a = stack.front();
                 stack.pop_front();
-                int b = stack.front();
-                stack.pop_front();
-                stack.push_front(b % a);
+                stack.front() %= a;
                 break;
             }
 
@@ -114,25 +104,25 @@ void Interpreter::interpret() {
             case STORE: {
                 int value = stack.front();
                 stack.pop_front();
-                int address = stack.front();
+                size_t address = stack.front();
+                stack.pop_front();
                 if(address < 0) {
                     throw OutOfBoundsException();
                 }
-                int size = heap.size();
-                if(size < address) {
-                    for(int i = size; i < address; i++) {
-                        heap.push_back(0);
-                    }
+                if(heap.size() <= address) {
+                    heap.resize(address + 1, 0);
                 }
-                heap.push_back(value);
+                heap[address] = value;
                 break;
             }
             case RETRIEVE: {
-                int size = heap.size();
                 int address = stack.front();
                 stack.pop_front();
-                if((size < address) || (address < 0)) {
+                int size = heap.size();
+                if(address < 0) {
                     throw OutOfBoundsException();
+                } else if(size <= address) {
+                    stack.push_front(0);
                 } else {
                     stack.push_front(heap[address]);
                 }
@@ -145,28 +135,26 @@ void Interpreter::interpret() {
                 break;
             }
             case CALL: {
-                int label = p[++pc];
+                int label = p[pc++];
                 auto pair = labels.find(label);
                 if(pair == labels.end()) {
                     throw LabelNotFoundException();
                 }
-                callStack.push_back(pc + 1);
+                callStack.push_back(pc);
                 pc = pair->second; // go to the instruction at the found program counter
                 break;
             }
             case JUMP: {
-                int label = p[++pc];
+                int label = p[pc++];
                 auto pair = labels.find(label);
                 if(pair == labels.end()) {
                     throw LabelNotFoundException();
                 }
-                /// callStack.push_back(pc); <- isn't necessary, because
-                // jumps are used for loops, not for subroutines
                 pc = pair->second;
                 break;
             }
             case JUMPZERO: {
-                int label = p[++pc];
+                int label = p[pc++];
                 if(stack.front() == 0) {
                     auto pair = labels.find(label);
                     if(pair == labels.end()) {
@@ -175,10 +163,11 @@ void Interpreter::interpret() {
                     // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
                 }
+                stack.pop_front();
                 break;
             }
             case JUMPNEG: {
-                int label = p[++pc];
+                int label = p[pc++];
                 if(stack.front() < 0) {
                     auto pair = labels.find(label);
                     if(pair == labels.end()) {
@@ -187,6 +176,7 @@ void Interpreter::interpret() {
                     // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
                 }
+                stack.pop_front();
                 break;
             }
             case ENDSUB: {
@@ -211,15 +201,24 @@ void Interpreter::interpret() {
                 break;
             }
             case READC: {
-                char character;
-                cin >> character;
-                heap.push_back(character);
+                char character = getchar();
+                size_t address = stack.front();
+                stack.pop_front();
+                if (heap.size() <= address) {
+                    heap.resize(address + 1, 0);
+                }
+                heap[address] = character;
                 break;
             }
             case READN: {
                 int number;
                 cin >> number;
-                heap.push_back(number);
+                size_t address = stack.front();
+                stack.pop_front();
+                if (heap.size() <= address) {
+                    heap.resize(address + 1, 0);
+                }
+                heap[address] = number;
                 break;
             }
             default:
