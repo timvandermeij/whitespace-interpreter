@@ -43,8 +43,7 @@ Program stringToProgram(string program) {
                     if(k >= size) throw SomeException();
                 }
                 long number = atoi(d.c_str());
-                p.push_back(PUSH);
-                p.push_back((Instruction)number);
+                p.push_back(Instruction(PUSH, number));
             } else throw SomeException();
         } else if(program[k] == 'A') {
             if(program.find("ADD", k) == k) {
@@ -56,7 +55,6 @@ Program stringToProgram(string program) {
                 if(program.find("COPY", k) == k) {
                     p.push_back(COPY);
                 } else if(program.find("CALL", k) == k) {
-                    p.push_back(CALL);
                     while(program[k++] == ' ' && k < size); // ignore any spaces
                     if(k >= size || program[k] == '\n') throw SomeException();
                     string d;
@@ -66,7 +64,7 @@ Program stringToProgram(string program) {
                         if(k >= size) throw SomeException();
                     }
                     long number = atoi(d.c_str());
-                    p.push_back((Instruction)number);
+                    p.push_back(Instruction(CALL, number));
                 } else throw SomeException();
             } else throw SomeException();
         } else if(program[k] == 'D') {
@@ -100,7 +98,7 @@ string programToString(Program p) {
     string s;
 
     for(size_t k = 0; k < size; k++) {
-        switch(p[k]) {
+        switch(p[k].type) {
             case PUSH: s.append("PUSH"); break;
             case DUP: s.append("DUP"); break;
             case COPY: s.append("COPY"); break;
@@ -130,11 +128,11 @@ string programToString(Program p) {
             case READN: s.append("READN"); break;
             default: throw InstructionNotFoundException();
         }
-        switch(p[k]) {
+        switch(p[k].type) {
             case PUSH: case COPY: case SLIDE: case MARK:
             case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
                 s.append(" ");
-                s.append(to_string(p[++k])); break;
+                s.append(to_string(p[k].arg)); break;
             default: break;
         }
         s.append("\n");

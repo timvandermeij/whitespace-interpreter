@@ -11,26 +11,17 @@ void Interpreter::interpret() {
     size_t pc, size = p.size();
 
     for(pc = 0; pc < size; pc++) {
-        switch(p[pc]) {
-            case PUSH: case COPY: case SLIDE:
-            case CALL: case JUMP: case JUMPZERO: case JUMPNEG:
-                pc++;
-                break;
-            case MARK: {
-                int label = p[++pc];
-                labels.insert(pair<int, unsigned>(label, pc + 1)); // Go to next instruction after label
-                break;
-            }
-            default: break;
+        if(p[pc].type == MARK) {
+            labels.insert(pair<int, unsigned>(p[pc].arg, pc + 1)); // Go to next instruction after label
         }
     }
 
     for(pc = 0; pc < size; ) {
-        switch(p[pc++]) {
+        Instruction inst = p[pc++];
+        switch(inst.type) {
             // Stack manipulations
             case PUSH: {
-                int arg = p[pc++];
-                stack.push_front(arg);
+                stack.push_front(inst.arg);
                 break;
             }
             case DUP: {
@@ -38,9 +29,8 @@ void Interpreter::interpret() {
                 break;
             }
             case COPY: {
-                int arg = p[pc++];
                 auto it = stack.begin();
-                advance(it, arg);
+                advance(it, inst.arg);
                 stack.push_front(*it);
                 break;
             }
@@ -59,9 +49,8 @@ void Interpreter::interpret() {
                 break;
             }
             case SLIDE: {
-                int arg = p[pc++];
                 int top = stack.front();
-                for(int i = 0; i <= arg; i++) {
+                for(int i = 0; i <= inst.arg; i++) {
                     stack.pop_front();
                 }
                 stack.push_front(top);
@@ -131,12 +120,10 @@ void Interpreter::interpret() {
 
             // Flow control
             case MARK: {
-                pc++;
                 break;
             }
             case CALL: {
-                int label = p[pc++];
-                auto pair = labels.find(label);
+                auto pair = labels.find(inst.arg);
                 if(pair == labels.end()) {
                     throw LabelNotFoundException();
                 }
@@ -145,8 +132,7 @@ void Interpreter::interpret() {
                 break;
             }
             case JUMP: {
-                int label = p[pc++];
-                auto pair = labels.find(label);
+                auto pair = labels.find(inst.arg);
                 if(pair == labels.end()) {
                     throw LabelNotFoundException();
                 }
@@ -154,26 +140,22 @@ void Interpreter::interpret() {
                 break;
             }
             case JUMPZERO: {
-                int label = p[pc++];
                 if(stack.front() == 0) {
-                    auto pair = labels.find(label);
+                    auto pair = labels.find(inst.arg);
                     if(pair == labels.end()) {
                         throw LabelNotFoundException();
                     }
-                    // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
                 }
                 stack.pop_front();
                 break;
             }
             case JUMPNEG: {
-                int label = p[pc++];
                 if(stack.front() < 0) {
-                    auto pair = labels.find(label);
+                    auto pair = labels.find(inst.arg);
                     if(pair == labels.end()) {
                         throw LabelNotFoundException();
                     }
-                    // callStack.push_back(pc); <- same comment as above
                     pc = pair->second;
                 }
                 stack.pop_front();

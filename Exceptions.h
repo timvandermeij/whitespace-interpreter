@@ -9,22 +9,7 @@ class UnreachableTokenException: public std::exception {
     }
 };
 
-class NoArgumentException: public std::exception {
-};
-
-class NoNumericArgumentException: public NoArgumentException {
-    virtual const char *what() const throw () {
-        return "Error: no numeric argument was passed.";
-    }
-};
-
-class NoLabelArgumentException: public NoArgumentException {
-    virtual const char *what() const throw () {
-        return "Error: no label argument was passed.";
-    }
-};
-
-class OutOfBoundsException: public NoArgumentException {
+class OutOfBoundsException: public std::exception {
     virtual const char *what() const throw () {
         return "Error: index out of bounds.";
     }

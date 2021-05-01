@@ -94,11 +94,12 @@ Program Parser::tokensToProgram(const vector<Token> &tokens) {
 
 // Side-effect: mutates the index from the for-loop in tokensToProgram
 // Labels are also represented as numbers, so labels will be handled as well.
-long Parser::tokensToNumber(const vector<Token> &tokens, size_t &k) {
+long long Parser::tokensToNumber(const vector<Token> &tokens, size_t &k) {
     size_t amount = tokens.size();
-    int sign;
-    long sum = 0;
+    long long sign;
+    long long sum = 0;
 
+    k++;
     if(tokens[k] == SPACE) {
         sign = 1;
     } else if(tokens[k] == TAB) {
@@ -122,30 +123,18 @@ long Parser::tokensToNumber(const vector<Token> &tokens, size_t &k) {
     return sign * sum;
 }
 
-void Parser::parseNumber(const vector<Token> &tokens, Program &p, size_t &k) {
-    if(tokens[++k] == LINEFEED) { // No label as argument
-        throw NoLabelArgumentException();
-    } else { // We're going to parse the label now
-        p.push_back((Instruction)tokensToNumber(tokens, k));
-    }
-}
-
 void Parser::processStackManip(const vector<Token> &tokens, Program &p, size_t &k) {
     if(tokens[k] == SPACE) { // PUSH
-        p.push_back(PUSH);
-        parseNumber(tokens, p, k);
+        p.push_back(Instruction(PUSH, tokensToNumber(tokens, k)));
     } else if(tokens[k] == TAB) {
         k++;
         if(tokens[k] == SPACE) { // COPY
-            p.push_back(COPY);
+            p.push_back(Instruction(COPY, tokensToNumber(tokens, k)));
         } else if(tokens[k] == LINEFEED) { // SLIDE
-            p.push_back(SLIDE);
+            p.push_back(Instruction(SLIDE, tokensToNumber(tokens, k)));
         } else {
             throw UnreachableTokenException();
         }
-        // COPY and SLIDE both require a numeric argument,
-        // so we shall try to parse a number now
-        parseNumber(tokens, p, k);
     } else if(tokens[k] == LINEFEED) { // DUP, SWAP or DISCARD
         // Could perhaps also be done more concisely
         // with the ?:-operator, but I reckon something will go wrong
@@ -205,25 +194,20 @@ void Parser::processFlowCont(const vector<Token> &tokens, Program &p, size_t &k)
     if(tokens[k] == SPACE) {
         k++;
         if(tokens[k] == SPACE) { // MARK
-            p.push_back(MARK);
-            parseNumber(tokens, p, k);
+            p.push_back(Instruction(MARK, tokensToNumber(tokens, k)));
         } else if(tokens[k] == TAB) { // CALL
-            p.push_back(CALL);
-            parseNumber(tokens, p, k);
+            p.push_back(Instruction(CALL, tokensToNumber(tokens, k)));
         } else if(tokens[k] == LINEFEED) { // JUMP
-            p.push_back(JUMP);
-            parseNumber(tokens, p, k);
+            p.push_back(Instruction(JUMP, tokensToNumber(tokens, k)));
         } else {
             throw UnreachableTokenException();
         }
     } else if(tokens[k] == TAB) {
         k++;
         if(tokens[k] == SPACE) { // JUMPZERO
-            p.push_back(JUMPZERO);
-            parseNumber(tokens, p, k);
+            p.push_back(Instruction(JUMPZERO, tokensToNumber(tokens, k)));
         } else if(tokens[k] == TAB) { // JUMPNEG
-            p.push_back(JUMPNEG);
-            parseNumber(tokens, p, k);
+            p.push_back(Instruction(JUMPNEG, tokensToNumber(tokens, k)));
         } else if(tokens[k] == LINEFEED) { // ENDSUB
             p.push_back(ENDSUB);
         } else {
