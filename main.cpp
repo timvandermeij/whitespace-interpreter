@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
             filename = argv[2];
         } else if(argc > 2) {
             cout << "usage: " << argv[0] << " [-v/--verbose] [program]" << endl;
-            exit(2);
+            return 2;
         }
     }
 
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
         ifstream input(filename);
         if(!input.is_open()) {
             cout << "File does not exist: " << filename << endl;
-            exit(1);
+            return 1;
         }
         fileContents = readFile(input);
     }
